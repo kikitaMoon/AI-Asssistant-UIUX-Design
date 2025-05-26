@@ -2,14 +2,17 @@
 import React, { useState } from 'react';
 import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const Index = () => {
   const [message, setMessage] = useState('');
+  const [selectedModel, setSelectedModel] = useState('gpt-4');
   const { isDark, toggleTheme } = useTheme();
 
   const handleSend = () => {
     if (message.trim()) {
       console.log('Sending message:', message);
+      console.log('Using model:', selectedModel);
       setMessage('');
     }
   };
@@ -43,6 +46,22 @@ const Index = () => {
           <p className="text-gray-600 dark:text-gray-300">How can I help you today?</p>
         </div>
 
+        {/* Model Switcher */}
+        <div className="mb-6">
+          <Select value={selectedModel} onValueChange={setSelectedModel}>
+            <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <SelectValue placeholder="Select AI Model" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gpt-4">ChatGPT (GPT-4)</SelectItem>
+              <SelectItem value="gpt-3.5">ChatGPT (GPT-3.5)</SelectItem>
+              <SelectItem value="claude">Claude</SelectItem>
+              <SelectItem value="llama">LLAMA</SelectItem>
+              <SelectItem value="custom">Custom Model</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Input Container */}
         <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-300">
           {/* Text Area */}
@@ -56,13 +75,13 @@ const Index = () => {
           />
 
           {/* Bottom Button Container */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 transition-colors duration-300">
+          <div className="absolute bottom-0 left-0 right-0 p-4 transition-colors duration-300">
             <div className="flex items-center justify-between">
               {/* Left aligned buttons */}
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => console.log('Voice input')}
-                  className="p-2 rounded-lg bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 group"
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group"
                   title="Voice input"
                 >
                   <Mic className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
@@ -70,7 +89,7 @@ const Index = () => {
                 
                 <button
                   onClick={() => console.log('Attach file')}
-                  className="p-2 rounded-lg bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 group"
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group"
                   title="Attach file"
                 >
                   <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
@@ -78,7 +97,7 @@ const Index = () => {
                 
                 <button
                   onClick={() => console.log('Add emoji')}
-                  className="p-2 rounded-lg bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 group"
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group"
                   title="Add emoji"
                 >
                   <Smile className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
@@ -86,7 +105,7 @@ const Index = () => {
                 
                 <button
                   onClick={() => console.log('Settings')}
-                  className="p-2 rounded-lg bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 group"
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group"
                   title="Settings"
                 >
                   <Settings className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
