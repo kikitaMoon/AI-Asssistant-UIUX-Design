@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun } from 'lucide-react';
+import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun, Bot, Zap, Brain, Cpu, Wrench } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -25,7 +25,48 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex flex-col items-center justify-center p-4 transition-colors duration-300">
+      {/* Model Switcher at the top */}
+      <div className="w-full max-w-2xl mb-8">
+        <Select value={selectedModel} onValueChange={setSelectedModel}>
+          <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <SelectValue placeholder="Select AI Model" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="gpt-4">
+              <div className="flex items-center gap-2">
+                <Bot className="w-4 h-4 text-green-600" />
+                ChatGPT (GPT-4)
+              </div>
+            </SelectItem>
+            <SelectItem value="gpt-3.5">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-blue-600" />
+                ChatGPT (GPT-3.5)
+              </div>
+            </SelectItem>
+            <SelectItem value="claude">
+              <div className="flex items-center gap-2">
+                <Brain className="w-4 h-4 text-purple-600" />
+                Claude
+              </div>
+            </SelectItem>
+            <SelectItem value="llama">
+              <div className="flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-orange-600" />
+                LLAMA
+              </div>
+            </SelectItem>
+            <SelectItem value="custom">
+              <div className="flex items-center gap-2">
+                <Wrench className="w-4 h-4 text-gray-600" />
+                Custom Model
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -44,22 +85,6 @@ const Index = () => {
             </button>
           </div>
           <p className="text-gray-600 dark:text-gray-300">How can I help you today?</p>
-        </div>
-
-        {/* Model Switcher */}
-        <div className="mb-6">
-          <Select value={selectedModel} onValueChange={setSelectedModel}>
-            <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <SelectValue placeholder="Select AI Model" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="gpt-4">ChatGPT (GPT-4)</SelectItem>
-              <SelectItem value="gpt-3.5">ChatGPT (GPT-3.5)</SelectItem>
-              <SelectItem value="claude">Claude</SelectItem>
-              <SelectItem value="llama">LLAMA</SelectItem>
-              <SelectItem value="custom">Custom Model</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {/* Input Container */}
