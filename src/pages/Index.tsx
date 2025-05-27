@@ -1,18 +1,47 @@
 
 import React, { useState } from 'react';
-import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun, Bot, Zap, Brain, Cpu, Wrench, Plus, Server, Upload, Camera, Check } from 'lucide-react';
+import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun, Bot, Zap, Brain, Cpu, Wrench, Plus, Server, Upload, Camera, Check, ChevronDown, ChevronRight } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const Index = () => {
   const [message, setMessage] = useState('');
   const [selectedModel, setSelectedModel] = useState('gpt-4');
   const [selectedServers, setSelectedServers] = useState<string[]>([]);
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [expandedServers, setExpandedServers] = useState<string[]>([]);
   const [mcpServers] = useState([
-    { id: 'server1', name: 'Development Server', status: 'connected' },
-    { id: 'server2', name: 'Production Server', status: 'connected' },
-    { id: 'server3', name: 'Testing Server', status: 'disconnected' }
+    { 
+      id: 'server1', 
+      name: 'Development Server', 
+      status: 'connected',
+      features: [
+        { id: 'dev-db', name: 'Database Access' },
+        { id: 'dev-api', name: 'API Testing' },
+        { id: 'dev-logs', name: 'Log Analysis' }
+      ]
+    },
+    { 
+      id: 'server2', 
+      name: 'Production Server', 
+      status: 'connected',
+      features: [
+        { id: 'prod-monitor', name: 'System Monitoring' },
+        { id: 'prod-deploy', name: 'Deployment' },
+        { id: 'prod-backup', name: 'Backup Management' }
+      ]
+    },
+    { 
+      id: 'server3', 
+      name: 'Testing Server', 
+      status: 'disconnected',
+      features: [
+        { id: 'test-suite', name: 'Test Suite' },
+        { id: 'test-coverage', name: 'Coverage Reports' }
+      ]
+    }
   ]);
   const { isDark, toggleTheme } = useTheme();
 
@@ -40,6 +69,22 @@ const Index = () => {
     );
   };
 
+  const toggleFeatureSelection = (featureId: string) => {
+    setSelectedFeatures(prev => 
+      prev.includes(featureId) 
+        ? prev.filter(id => id !== featureId)
+        : [...prev, featureId]
+    );
+  };
+
+  const toggleServerExpansion = (serverId: string) => {
+    setExpandedServers(prev => 
+      prev.includes(serverId)
+        ? prev.filter(id => id !== serverId)
+        : [...prev, serverId]
+    );
+  };
+
   const handleAddNewServer = () => {
     console.log('Add new MCP server');
     // This would typically open a modal or navigate to a server configuration page
@@ -48,7 +93,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex flex-col p-4 transition-colors duration-300">
       {/* Model Switcher at the very top */}
-      <div className="w-full max-w-2xl mx-auto mb-8">
+      <div className="w-full max-w-2xl mx-auto mb-12">
         <Select value={selectedModel} onValueChange={setSelectedModel}>
           <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <SelectValue placeholder="Select AI Model" />
@@ -142,32 +187,69 @@ const Index = () => {
                         title="MCP Server"
                       >
                         <Server className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                        {selectedServers.length > 0 && (
+                        {(selectedServers.length > 0 || selectedFeatures.length > 0) && (
                           <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                            {selectedServers.length}
+                            {selectedServers.length + selectedFeatures.length}
                           </span>
                         )}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto">
                       <div className="px-2 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
                         MCP Servers
                       </div>
                       <DropdownMenuSeparator />
                       {mcpServers.map((server) => (
-                        <DropdownMenuCheckboxItem
-                          key={server.id}
-                          checked={selectedServers.includes(server.id)}
-                          onCheckedChange={() => toggleServerSelection(server.id)}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
-                            }`} />
-                            <span>{server.name}</span>
-                          </div>
-                        </DropdownMenuCheckboxItem>
+                        <div key={server.id}>
+                          <Collapsible 
+                            open={expandedServers.includes(server.id)}
+                            onOpenChange={() => toggleServerExpansion(server.id)}
+                          >
+                            <div className="flex items-center">
+                              <DropdownMenuCheckboxItem
+                                checked={selectedServers.includes(server.id)}
+                                onCheckedChange={() => toggleServerSelection(server.id)}
+                                className="flex items-center justify-between flex-1 pr-2"
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-2 h-2 rounded-full ${
+                                    server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                                  }`} />
+                                  <span>{server.name}</span>
+                                </div>
+                              </DropdownMenuCheckboxItem>
+                              <CollapsibleTrigger asChild>
+                                <button 
+                                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleServerExpansion(server.id);
+                                  }}
+                                >
+                                  {expandedServers.includes(server.id) ? (
+                                    <ChevronDown className="w-4 h-4" />
+                                  ) : (
+                                    <ChevronRight className="w-4 h-4" />
+                                  )}
+                                </button>
+                              </CollapsibleTrigger>
+                            </div>
+                            <CollapsibleContent className="pl-6">
+                              {server.features.map((feature) => (
+                                <DropdownMenuCheckboxItem
+                                  key={feature.id}
+                                  checked={selectedFeatures.includes(feature.id)}
+                                  onCheckedChange={() => toggleFeatureSelection(feature.id)}
+                                  className="text-sm"
+                                  onSelect={(e) => e.preventDefault()}
+                                >
+                                  {feature.name}
+                                </DropdownMenuCheckboxItem>
+                              ))}
+                            </CollapsibleContent>
+                          </Collapsible>
+                        </div>
                       ))}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2">
