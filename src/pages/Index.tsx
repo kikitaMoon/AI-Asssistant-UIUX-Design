@@ -1,18 +1,26 @@
 
 import React, { useState } from 'react';
-import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun, Bot, Zap, Brain, Cpu, Wrench, Plus, Server, Upload, Camera } from 'lucide-react';
+import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun, Bot, Zap, Brain, Cpu, Wrench, Plus, Server, Upload, Camera, Check } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 
 const Index = () => {
   const [message, setMessage] = useState('');
   const [selectedModel, setSelectedModel] = useState('gpt-4');
+  const [selectedServers, setSelectedServers] = useState<string[]>([]);
+  const [mcpServers] = useState([
+    { id: 'server1', name: 'Development Server', status: 'connected' },
+    { id: 'server2', name: 'Production Server', status: 'connected' },
+    { id: 'server3', name: 'Testing Server', status: 'disconnected' }
+  ]);
   const { isDark, toggleTheme } = useTheme();
 
   const handleSend = () => {
     if (message.trim()) {
       console.log('Sending message:', message);
       console.log('Using model:', selectedModel);
+      console.log('Selected servers:', selectedServers);
       setMessage('');
     }
   };
@@ -24,10 +32,23 @@ const Index = () => {
     }
   };
 
+  const toggleServerSelection = (serverId: string) => {
+    setSelectedServers(prev => 
+      prev.includes(serverId) 
+        ? prev.filter(id => id !== serverId)
+        : [...prev, serverId]
+    );
+  };
+
+  const handleAddNewServer = () => {
+    console.log('Add new MCP server');
+    // This would typically open a modal or navigate to a server configuration page
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex flex-col p-4 transition-colors duration-300">
       {/* Model Switcher at the very top */}
-      <div className="w-full max-w-2xl mx-auto mb-4">
+      <div className="w-full max-w-2xl mx-auto mb-8">
         <Select value={selectedModel} onValueChange={setSelectedModel}>
           <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <SelectValue placeholder="Select AI Model" />
@@ -114,13 +135,47 @@ const Index = () => {
                     <Plus className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                   </button>
                   
-                  <button
-                    onClick={() => console.log('MCP Server')}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group"
-                    title="MCP Server"
-                  >
-                    <Server className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group relative"
+                        title="MCP Server"
+                      >
+                        <Server className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                        {selectedServers.length > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                            {selectedServers.length}
+                          </span>
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56">
+                      <div className="px-2 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        MCP Servers
+                      </div>
+                      <DropdownMenuSeparator />
+                      {mcpServers.map((server) => (
+                        <DropdownMenuCheckboxItem
+                          key={server.id}
+                          checked={selectedServers.includes(server.id)}
+                          onCheckedChange={() => toggleServerSelection(server.id)}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                            }`} />
+                            <span>{server.name}</span>
+                          </div>
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2">
+                        <Plus className="w-4 h-4" />
+                        Add New Server
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   
                   <button
                     onClick={() => console.log('Upload a file')}
