@@ -202,70 +202,89 @@ const Index = () => {
 
             {/* Settings Dialog */}
             <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-              <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-2xl">
+              <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-6xl w-[80vw] h-[80vh] max-h-[80vh]">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                     Settings
                   </DialogTitle>
                 </DialogHeader>
-                <Tabs defaultValue="general" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 bg-gray-700">
-                    <TabsTrigger value="general" className="text-white data-[state=active]:bg-gray-600">General</TabsTrigger>
-                    <TabsTrigger value="mcp" className="text-white data-[state=active]:bg-gray-600">MCP Server</TabsTrigger>
-                    <TabsTrigger value="llm" className="text-white data-[state=active]:bg-gray-600">LLM Model Provider</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="general" className="space-y-4 mt-4">
-                    <div className="flex items-center justify-between">
-                      <span>Theme</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={toggleTheme}
-                        className="text-white hover:bg-gray-700"
+                <div className="flex h-full mt-4">
+                  <Tabs defaultValue="general" orientation="vertical" className="flex w-full h-full">
+                    <TabsList className="flex flex-col h-full w-48 bg-gray-700 p-2 justify-start">
+                      <TabsTrigger 
+                        value="general" 
+                        className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-2 py-3"
                       >
-                        {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                      </Button>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="mcp" className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold">MCP Servers</h3>
-                      {mcpServers.map((server) => (
-                        <div key={server.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
-                            }`} />
-                            <span>{server.name}</span>
-                          </div>
-                          <span className="text-sm text-gray-400">{server.status}</span>
+                        General
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="mcp" 
+                        className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-2 py-3"
+                      >
+                        MCP Server
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="llm" 
+                        className="w-full justify-start text-white data-[state=active]:bg-gray-600 py-3"
+                      >
+                        LLM Model Provider
+                      </TabsTrigger>
+                    </TabsList>
+                    <div className="flex-1 pl-6 overflow-auto">
+                      <TabsContent value="general" className="space-y-4 mt-0 h-full">
+                        <div className="flex items-center justify-between">
+                          <span>Theme</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={toggleTheme}
+                            className="text-white hover:bg-gray-700"
+                          >
+                            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                          </Button>
                         </div>
-                      ))}
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="llm" className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold">Available Models</h3>
-                      {availableModels.map((model) => {
-                        const IconComponent = model.icon;
-                        return (
-                          <div key={model.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
-                            <div className="flex items-center gap-2">
-                              <IconComponent className={`w-4 h-4 ${model.color}`} />
-                              <span>{model.name}</span>
+                      </TabsContent>
+                      <TabsContent value="mcp" className="space-y-4 mt-0 h-full">
+                        <div className="space-y-2">
+                          <h3 className="text-lg font-semibold">MCP Servers</h3>
+                          {mcpServers.map((server) => (
+                            <div key={server.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${
+                                  server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                                }`} />
+                                <span>{server.name}</span>
+                              </div>
+                              <span className="text-sm text-gray-400">{server.status}</span>
                             </div>
-                            <input
-                              type="checkbox"
-                              checked={selectedModels.includes(model.id)}
-                              onChange={() => toggleModelSelection(model.id)}
-                              className="text-blue-600"
-                            />
-                          </div>
-                        );
-                      })}
+                          ))}
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="llm" className="space-y-4 mt-0 h-full">
+                        <div className="space-y-2">
+                          <h3 className="text-lg font-semibold">Available Models</h3>
+                          {availableModels.map((model) => {
+                            const IconComponent = model.icon;
+                            return (
+                              <div key={model.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                                <div className="flex items-center gap-2">
+                                  <IconComponent className={`w-4 h-4 ${model.color}`} />
+                                  <span>{model.name}</span>
+                                </div>
+                                <input
+                                  type="checkbox"
+                                  checked={selectedModels.includes(model.id)}
+                                  onChange={() => toggleModelSelection(model.id)}
+                                  className="text-blue-600"
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </TabsContent>
                     </div>
-                  </TabsContent>
-                </Tabs>
+                  </Tabs>
+                </div>
               </DialogContent>
             </Dialog>
 
