@@ -25,9 +25,10 @@ const historicalTopics = [
 
 interface AppSidebarProps {
   onNewChat: () => void;
+  onSettingsClick: () => void;
 }
 
-export function AppSidebar({ onNewChat }: AppSidebarProps) {
+export function AppSidebar({ onNewChat, onSettingsClick }: AppSidebarProps) {
   const handleTopicClick = (topicId: string) => {
     console.log('Loading topic:', topicId);
     // This would typically load the selected conversation
@@ -79,7 +80,17 @@ export function AppSidebar({ onNewChat }: AppSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border">
-        {/* Settings moved to main page header */}
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={onSettingsClick}
+              className="w-full justify-start hover:bg-sidebar-accent"
+            >
+              <Settings className="w-4 h-4" />
+              <span>Settings</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

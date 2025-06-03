@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -6,9 +5,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '../components/AppSidebar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Moon, Sun, Settings } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Moon, Sun } from 'lucide-react';
 
 interface ChatMessage {
   id: string;
@@ -192,23 +192,29 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar onNewChat={handleNewChat} />
+        <AppSidebar onNewChat={handleNewChat} onSettingsClick={() => setIsSettingsOpen(true)} />
         <SidebarInset>
           <div className="min-h-screen bg-black flex flex-col p-4 transition-colors duration-300 overflow-hidden">
             {/* Sidebar trigger */}
             <div className="mb-4 flex justify-between items-center">
               <SidebarTrigger />
-              <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-white hover:bg-gray-800">
-                    <Settings className="w-5 h-5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-gray-800 text-white border-gray-700">
-                  <DialogHeader>
-                    <DialogTitle>Settings</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
+            </div>
+
+            {/* Settings Dialog */}
+            <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+              <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    Settings
+                  </DialogTitle>
+                </DialogHeader>
+                <Tabs defaultValue="general" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 bg-gray-700">
+                    <TabsTrigger value="general" className="text-white data-[state=active]:bg-gray-600">General</TabsTrigger>
+                    <TabsTrigger value="mcp" className="text-white data-[state=active]:bg-gray-600">MCP Server</TabsTrigger>
+                    <TabsTrigger value="llm" className="text-white data-[state=active]:bg-gray-600">LLM Model Provider</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="general" className="space-y-4 mt-4">
                     <div className="flex items-center justify-between">
                       <span>Theme</span>
                       <Button
@@ -220,10 +226,48 @@ const Index = () => {
                         {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                       </Button>
                     </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+                  </TabsContent>
+                  <TabsContent value="mcp" className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">MCP Servers</h3>
+                      {mcpServers.map((server) => (
+                        <div key={server.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                            }`} />
+                            <span>{server.name}</span>
+                          </div>
+                          <span className="text-sm text-gray-400">{server.status}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="llm" className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">Available Models</h3>
+                      {availableModels.map((model) => {
+                        const IconComponent = model.icon;
+                        return (
+                          <div key={model.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                            <div className="flex items-center gap-2">
+                              <IconComponent className={`w-4 h-4 ${model.color}`} />
+                              <span>{model.name}</span>
+                            </div>
+                            <input
+                              type="checkbox"
+                              checked={selectedModels.includes(model.id)}
+                              onChange={() => toggleModelSelection(model.id)}
+                              className="text-blue-600"
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </DialogContent>
+            </Dialog>
 
             {/* Main content area */}
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -232,7 +276,7 @@ const Index = () => {
                   <div className="w-full max-w-4xl">
                     {/* Welcome Message */}
                     <div className="text-center mb-8">
-                      <h1 className="text-4xl font-bold text-white mb-2">
+                      <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
                         Welcome to AI Assistant
                       </h1>
                       <p className="text-gray-400 text-lg">
