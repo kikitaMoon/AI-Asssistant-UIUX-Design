@@ -1,12 +1,21 @@
 
 import React, { useState } from 'react';
-import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun, Bot, Zap, Brain, Cpu, Wrench, Plus, Server, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb } from 'lucide-react';
+import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '../components/AppSidebar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Moon, Sun, Settings } from 'lucide-react';
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
 
 const Index = () => {
   const [message, setMessage] = useState('');
@@ -14,6 +23,8 @@ const Index = () => {
   const [selectedServers, setSelectedServers] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [mcpServers] = useState([
     { 
       id: 'server1', 
@@ -58,24 +69,35 @@ const Index = () => {
   const sampleQuestions = [
     {
       text: "How can I optimize my React application performance?",
-      icon: Code
+      icon: Code,
+      sampleResponse: "Here are key strategies to optimize React performance:\n\n1. **Use React.memo()** for functional components\n2. **Implement useMemo()** for expensive calculations\n3. **Use useCallback()** for function props\n4. **Code splitting** with React.lazy()\n5. **Optimize bundle size** with tree shaking"
     },
     {
       text: "What are the best practices for TypeScript development?",
-      icon: Database
+      icon: Database,
+      sampleResponse: "TypeScript best practices include:\n\n1. **Enable strict mode** in tsconfig.json\n2. **Use proper type definitions** instead of 'any'\n3. **Leverage union types** and type guards\n4. **Create custom types** for better code organization\n5. **Use interfaces** for object shapes"
     },
     {
       text: "How do I implement authentication in a web app?",
-      icon: Shield
+      icon: Shield,
+      sampleResponse: "Authentication implementation steps:\n\n1. **Choose authentication method** (JWT, OAuth, etc.)\n2. **Set up secure password hashing** (bcrypt)\n3. **Implement login/logout endpoints**\n4. **Use HTTPS** for all auth requests\n5. **Store tokens securely** (httpOnly cookies)\n6. **Add route protection** middleware"
     },
     {
       text: "What's the difference between REST and GraphQL APIs?",
-      icon: Lightbulb
+      icon: Lightbulb,
+      sampleResponse: "Key differences between REST and GraphQL:\n\n**REST:**\n- Multiple endpoints for different resources\n- Fixed data structure in responses\n- HTTP methods (GET, POST, PUT, DELETE)\n\n**GraphQL:**\n- Single endpoint for all operations\n- Client specifies exact data needed\n- Reduces over-fetching and under-fetching\n- Strong type system"
     }
   ];
 
   const handleSend = () => {
     if (message.trim()) {
+      const newMessage: ChatMessage = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: message,
+        timestamp: new Date()
+      };
+      setChatMessages(prev => [...prev, newMessage]);
       console.log('Sending message:', message);
       console.log('Using models:', selectedModels);
       console.log('Selected servers:', selectedServers);
@@ -90,8 +112,28 @@ const Index = () => {
     }
   };
 
-  const handleSampleQuestion = (question: string) => {
-    setMessage(question);
+  const handleSampleQuestion = (question: { text: string; sampleResponse: string }) => {
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: question.text,
+      timestamp: new Date()
+    };
+    
+    const assistantMessage: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: question.sampleResponse,
+      timestamp: new Date()
+    };
+
+    setChatMessages([userMessage, assistantMessage]);
+    setMessage('');
+  };
+
+  const handleNewChat = () => {
+    setChatMessages([]);
+    setMessage('');
   };
 
   const toggleServerSelection = (serverId: string) => {
@@ -130,50 +172,104 @@ const Index = () => {
     );
   };
 
+  const renderChatMessage = (msg: ChatMessage) => (
+    <div key={msg.id} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+      <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+        msg.role === 'user' 
+          ? 'bg-blue-600 text-white' 
+          : 'bg-gray-700 text-gray-100'
+      }`}>
+        <div className="whitespace-pre-wrap">{msg.content}</div>
+        <div className={`text-xs mt-1 ${
+          msg.role === 'user' ? 'text-blue-100' : 'text-gray-400'
+        }`}>
+          {msg.timestamp.toLocaleTimeString()}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
+        <AppSidebar onNewChat={handleNewChat} />
         <SidebarInset>
-          <div className="min-h-screen bg-black flex flex-col p-4 transition-colors duration-300">
+          <div className="min-h-screen bg-black flex flex-col p-4 transition-colors duration-300 overflow-hidden">
             {/* Sidebar trigger */}
-            <div className="mb-4">
+            <div className="mb-4 flex justify-between items-center">
               <SidebarTrigger />
+              <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-white hover:bg-gray-800">
+                    <Settings className="w-5 h-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-gray-800 text-white border-gray-700">
+                  <DialogHeader>
+                    <DialogTitle>Settings</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span>Theme</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleTheme}
+                        className="text-white hover:bg-gray-700"
+                      >
+                        {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Main content area */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="w-full max-w-4xl">
-                {/* Welcome Message */}
-                <div className="text-center mb-8">
-                  <h1 className="text-4xl font-bold text-white mb-2">
-                    Welcome to AI Assistant
-                  </h1>
-                  <p className="text-gray-400 text-lg">
-                    How can I help you today?
-                  </p>
-                </div>
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {chatMessages.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="w-full max-w-4xl">
+                    {/* Welcome Message */}
+                    <div className="text-center mb-8">
+                      <h1 className="text-4xl font-bold text-white mb-2">
+                        Welcome to AI Assistant
+                      </h1>
+                      <p className="text-gray-400 text-lg">
+                        How can I help you today?
+                      </p>
+                    </div>
 
-                {/* Sample Questions with Icons */}
-                <div className="text-center mb-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
-                    {sampleQuestions.map((item, index) => {
-                      const IconComponent = item.icon;
-                      return (
-                        <button
-                          key={index}
-                          onClick={() => handleSampleQuestion(item.text)}
-                          className="p-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-left transition-colors duration-200 border border-gray-700 flex flex-col items-start gap-3"
-                        >
-                          <IconComponent className="w-6 h-6 text-blue-400" />
-                          <span className="text-sm leading-relaxed">{item.text}</span>
-                        </button>
-                      );
-                    })}
+                    {/* Sample Questions with Icons */}
+                    <div className="text-center mb-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                        {sampleQuestions.map((item, index) => {
+                          const IconComponent = item.icon;
+                          return (
+                            <button
+                              key={index}
+                              onClick={() => handleSampleQuestion(item)}
+                              className="p-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-left transition-colors duration-200 border border-gray-700 flex flex-col items-start gap-3"
+                            >
+                              <IconComponent className="w-6 h-6 text-blue-400" />
+                              <span className="text-sm leading-relaxed">{item.text}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </div>
+              ) : (
+                <div className="flex-1 mb-4 overflow-y-auto scrollbar-hide">
+                  <div className="max-w-4xl mx-auto p-4">
+                    {chatMessages.map(renderChatMessage)}
+                  </div>
+                </div>
+              )}
 
-                {/* Input Container */}
+              {/* Input Container */}
+              <div className="w-full max-w-4xl mx-auto">
                 <div className="relative bg-gray-800 rounded-2xl shadow-lg border border-gray-700 overflow-hidden transition-colors duration-300">
                   {/* Text Area */}
                   <textarea
@@ -181,7 +277,7 @@ const Index = () => {
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your message here..."
-                    className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px]"
+                    className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px] overflow-hidden"
                     rows={3}
                   />
 

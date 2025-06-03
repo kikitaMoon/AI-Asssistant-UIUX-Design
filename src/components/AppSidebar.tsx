@@ -23,20 +23,14 @@ const historicalTopics = [
   { id: '5', title: 'Database Design Questions', date: '2025-05-22' },
 ];
 
-export function AppSidebar() {
-  const handleNewChat = () => {
-    console.log('Starting new chat');
-    // This would typically clear the current conversation and start fresh
-  };
+interface AppSidebarProps {
+  onNewChat: () => void;
+}
 
+export function AppSidebar({ onNewChat }: AppSidebarProps) {
   const handleTopicClick = (topicId: string) => {
     console.log('Loading topic:', topicId);
     // This would typically load the selected conversation
-  };
-
-  const handleSettings = () => {
-    console.log('Opening settings');
-    // This would typically open a settings modal or page
   };
 
   return (
@@ -45,7 +39,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
-              onClick={handleNewChat}
+              onClick={onNewChat}
               className="w-full justify-start bg-sidebar-accent hover:bg-sidebar-accent/80"
             >
               <Plus className="w-4 h-4" />
@@ -55,14 +49,14 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="overflow-hidden">
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center gap-2">
             <History className="w-4 h-4" />
             Chat History
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="overflow-y-auto scrollbar-hide max-h-[calc(100vh-200px)]">
               {historicalTopics.map((topic) => (
                 <SidebarMenuItem key={topic.id}>
                   <SidebarMenuButton 
@@ -85,14 +79,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleSettings}>
-              <Settings className="w-4 h-4" />
-              <span>Settings</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        {/* Settings moved to main page header */}
       </SidebarFooter>
     </Sidebar>
   );
