@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun, Bot, Zap, Brain, Cpu, Wrench, Plus, Server, Upload, Camera, Check, ChevronDown, ChevronRight } from 'lucide-react';
+import { Send, Mic, Paperclip, Smile, Settings, Moon, Sun, Bot, Zap, Brain, Cpu, Wrench, Plus, Server, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
@@ -9,7 +10,7 @@ import { AppSidebar } from '../components/AppSidebar';
 
 const Index = () => {
   const [message, setMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState('gpt-4');
+  const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4']);
   const [selectedServers, setSelectedServers] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
@@ -46,17 +47,37 @@ const Index = () => {
   ]);
   const { isDark, toggleTheme } = useTheme();
 
+  const availableModels = [
+    { id: 'gpt-4', name: 'ChatGPT (GPT-4)', icon: Bot, color: 'text-green-600' },
+    { id: 'gpt-3.5', name: 'ChatGPT (GPT-3.5)', icon: Zap, color: 'text-blue-600' },
+    { id: 'claude', name: 'Claude', icon: Brain, color: 'text-purple-600' },
+    { id: 'llama', name: 'LLAMA', icon: Cpu, color: 'text-orange-600' },
+    { id: 'custom', name: 'Custom Model', icon: Wrench, color: 'text-gray-600' }
+  ];
+
   const sampleQuestions = [
-    "How can I optimize my React application performance?",
-    "What are the best practices for TypeScript development?",
-    "How do I implement authentication in a web app?",
-    "What's the difference between REST and GraphQL APIs?"
+    {
+      text: "How can I optimize my React application performance?",
+      icon: Code
+    },
+    {
+      text: "What are the best practices for TypeScript development?",
+      icon: Database
+    },
+    {
+      text: "How do I implement authentication in a web app?",
+      icon: Shield
+    },
+    {
+      text: "What's the difference between REST and GraphQL APIs?",
+      icon: Lightbulb
+    }
   ];
 
   const handleSend = () => {
     if (message.trim()) {
       console.log('Sending message:', message);
-      console.log('Using model:', selectedModel);
+      console.log('Using models:', selectedModels);
       console.log('Selected servers:', selectedServers);
       setMessage('');
     }
@@ -99,7 +120,14 @@ const Index = () => {
 
   const handleAddNewServer = () => {
     console.log('Add new MCP server');
-    // This would typically open a modal or navigate to a server configuration page
+  };
+
+  const toggleModelSelection = (modelId: string) => {
+    setSelectedModels(prev => 
+      prev.includes(modelId) 
+        ? prev.filter(id => id !== modelId)
+        : [...prev, modelId]
+    );
   };
 
   return (
@@ -113,62 +141,35 @@ const Index = () => {
               <SidebarTrigger />
             </div>
 
-            {/* Model Switcher at the very top */}
-            <div className="w-full max-w-2xl mx-auto mb-12">
-              <Select value={selectedModel} onValueChange={setSelectedModel}>
-                <SelectTrigger className="w-full bg-gray-800 border border-gray-700 text-white">
-                  <SelectValue placeholder="Select AI Model" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gpt-4">
-                    <div className="flex items-center gap-2">
-                      <Bot className="w-4 h-4 text-green-600" />
-                      ChatGPT (GPT-4)
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="gpt-3.5">
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-blue-600" />
-                      ChatGPT (GPT-3.5)
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="claude">
-                    <div className="flex items-center gap-2">
-                      <Brain className="w-4 h-4 text-purple-600" />
-                      Claude
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="llama">
-                    <div className="flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-orange-600" />
-                      LLAMA
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="custom">
-                    <div className="flex items-center gap-2">
-                      <Wrench className="w-4 h-4 text-gray-600" />
-                      Custom Model
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Main content area */}
             <div className="flex-1 flex items-center justify-center">
-              <div className="w-full max-w-2xl">
-                {/* Sample Questions */}
+              <div className="w-full max-w-4xl">
+                {/* Welcome Message */}
                 <div className="text-center mb-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {sampleQuestions.map((question, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSampleQuestion(question)}
-                        className="p-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-left transition-colors duration-200 border border-gray-700"
-                      >
-                        {question}
-                      </button>
-                    ))}
+                  <h1 className="text-4xl font-bold text-white mb-2">
+                    Welcome to AI Assistant
+                  </h1>
+                  <p className="text-gray-400 text-lg">
+                    How can I help you today?
+                  </p>
+                </div>
+
+                {/* Sample Questions with Icons */}
+                <div className="text-center mb-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {sampleQuestions.map((item, index) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => handleSampleQuestion(item.text)}
+                          className="p-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-left transition-colors duration-200 border border-gray-700 flex flex-col items-start gap-3"
+                        >
+                          <IconComponent className="w-6 h-6 text-blue-400" />
+                          <span className="text-sm leading-relaxed">{item.text}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -187,7 +188,7 @@ const Index = () => {
                   {/* Bottom Button Container */}
                   <div className="absolute bottom-0 left-0 right-0 p-4 transition-colors duration-300">
                     <div className="flex items-center justify-between">
-                      {/* Left aligned buttons - reordered as requested */}
+                      {/* Left aligned buttons */}
                       <div className="flex items-center space-x-3">
                         <button
                           onClick={() => console.log('Upload a file')}
@@ -219,8 +220,8 @@ const Index = () => {
                               )}
                             </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto">
-                            <div className="px-2 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto bg-gray-800 border-gray-700">
+                            <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
                               MCP Servers
                             </div>
                             <DropdownMenuSeparator />
@@ -234,7 +235,7 @@ const Index = () => {
                                     <DropdownMenuCheckboxItem
                                       checked={selectedServers.includes(server.id)}
                                       onCheckedChange={() => toggleServerSelection(server.id)}
-                                      className="flex items-center justify-between flex-1 pr-2"
+                                      className="flex items-center justify-between flex-1 pr-2 text-white"
                                       onSelect={(e) => e.preventDefault()}
                                     >
                                       <div className="flex items-center gap-2">
@@ -246,16 +247,16 @@ const Index = () => {
                                     </DropdownMenuCheckboxItem>
                                     <CollapsibleTrigger asChild>
                                       <button 
-                                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                        className="p-1 hover:bg-gray-700 rounded"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           toggleServerExpansion(server.id);
                                         }}
                                       >
                                         {expandedServers.includes(server.id) ? (
-                                          <ChevronDown className="w-4 h-4" />
+                                          <ChevronDown className="w-4 h-4 text-white" />
                                         ) : (
-                                          <ChevronRight className="w-4 h-4" />
+                                          <ChevronRight className="w-4 h-4 text-white" />
                                         )}
                                       </button>
                                     </CollapsibleTrigger>
@@ -266,7 +267,7 @@ const Index = () => {
                                         key={feature.id}
                                         checked={selectedFeatures.includes(feature.id)}
                                         onCheckedChange={() => toggleFeatureSelection(feature.id)}
-                                        className="text-sm"
+                                        className="text-sm text-white"
                                         onSelect={(e) => e.preventDefault()}
                                       >
                                         {feature.name}
@@ -277,24 +278,51 @@ const Index = () => {
                               </div>
                             ))}
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2">
+                            <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2 text-white">
                               <Plus className="w-4 h-4" />
                               Add New Server
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <button
-                          onClick={toggleTheme}
-                          className="p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200 group"
-                          title="Model provider"
-                        >
-                          {isDark ? (
-                            <Sun className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                          ) : (
-                            <Moon className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                          )}
-                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className="p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200 group relative"
+                              title="Model Provider"
+                            >
+                              <Bot className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                              {selectedModels.length > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                  {selectedModels.length}
+                                </span>
+                              )}
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-64 bg-gray-800 border-gray-700">
+                            <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
+                              AI Models
+                            </div>
+                            <DropdownMenuSeparator />
+                            {availableModels.map((model) => {
+                              const IconComponent = model.icon;
+                              return (
+                                <DropdownMenuCheckboxItem
+                                  key={model.id}
+                                  checked={selectedModels.includes(model.id)}
+                                  onCheckedChange={() => toggleModelSelection(model.id)}
+                                  className="text-white"
+                                  onSelect={(e) => e.preventDefault()}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <IconComponent className={`w-4 h-4 ${model.color}`} />
+                                    <span>{model.name}</span>
+                                  </div>
+                                </DropdownMenuCheckboxItem>
+                              );
+                            })}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
 
                       {/* Send button */}
