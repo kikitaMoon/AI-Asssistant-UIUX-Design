@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -59,7 +58,7 @@ const IndexContent = () => {
     }
   ]);
   const { isDark, toggleTheme } = useTheme();
-  const { open: sidebarOpen } = useSidebar();
+  const { open: sidebarOpen, isMobile } = useSidebar();
 
   const availableModels = [
     { id: 'gpt-4', name: 'ChatGPT (GPT-4)', icon: Bot, color: 'text-green-600' },
@@ -197,13 +196,13 @@ const IndexContent = () => {
       {/* Top bar with sidebar trigger and new chat button */}
       <div className="mb-4 flex justify-between items-center">
         <SidebarTrigger />
-        {!sidebarOpen && (
+        {(!sidebarOpen || isMobile) && (
           <Button
             onClick={handleNewChat}
+            size="icon"
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            New Chat
+            <Plus className="w-4 h-4" />
           </Button>
         )}
       </div>
@@ -320,7 +319,7 @@ const IndexContent = () => {
                       <button
                         key={index}
                         onClick={() => handleSampleQuestion(item)}
-                        className="p-4 bg-gray-700 hover:bg-gray-600 rounded-lg text-white text-left transition-colors duration-200 border border-gray-600 flex flex-col items-start gap-3"
+                        className="p-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-left transition-colors duration-200 border border-gray-600 flex flex-col items-start gap-3"
                       >
                         <IconComponent className="w-6 h-6 text-blue-400" />
                         <span className="text-sm leading-relaxed">{item.text}</span>
@@ -341,7 +340,7 @@ const IndexContent = () => {
 
         {/* Input Container */}
         <div className="w-full max-w-4xl mx-auto">
-          <div className="relative bg-gray-700 rounded-2xl shadow-lg border border-gray-600 overflow-hidden transition-colors duration-300">
+          <div className="relative bg-gray-800 rounded-2xl shadow-lg border border-gray-600 overflow-hidden transition-colors duration-300">
             {/* Text Area */}
             <textarea
               value={message}
@@ -503,13 +502,6 @@ const IndexContent = () => {
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* Footer */}
-          <div className="text-center mt-6">
-            <p className="text-sm text-gray-400">
-              Press Enter to send, Shift + Enter for new line
-            </p>
           </div>
         </div>
       </div>
