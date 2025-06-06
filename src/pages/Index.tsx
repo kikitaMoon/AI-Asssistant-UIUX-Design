@@ -19,14 +19,18 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-const IndexContent = () => {
+interface IndexContentProps {
+  isSettingsOpen: boolean;
+  setIsSettingsOpen: (open: boolean) => void;
+}
+
+const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) => {
   const [message, setMessage] = useState('');
   const [selectedModel, setSelectedModel] = useState('gpt-4'); // Changed to single model selection
   const [selectedServers, setSelectedServers] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [mcpServers] = useState([
     { 
       id: 'server1', 
@@ -505,10 +509,11 @@ const Index = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleNewChat = () => {
-    // This will be handled by the IndexContent component
+    console.log('New chat started');
   };
 
   const handleSettingsClick = () => {
+    console.log('Settings clicked');
     setIsSettingsOpen(true);
   };
 
@@ -517,7 +522,7 @@ const Index = () => {
       <div className="min-h-screen flex w-full">
         <AppSidebar onNewChat={handleNewChat} onSettingsClick={handleSettingsClick} />
         <SidebarInset>
-          <IndexContent />
+          <IndexContent isSettingsOpen={isSettingsOpen} setIsSettingsOpen={setIsSettingsOpen} />
         </SidebarInset>
       </div>
     </SidebarProvider>
