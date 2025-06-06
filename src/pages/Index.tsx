@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -211,13 +212,13 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
 
       {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-6xl w-[80vw] h-[80vh] max-h-[80vh]">
-          <DialogHeader>
+        <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-6xl w-[80vw] h-[80vh] max-h-[80vh] p-0">
+          <DialogHeader className="p-6 pb-0">
             <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Settings
             </DialogTitle>
           </DialogHeader>
-          <div className="flex h-full mt-4">
+          <div className="flex h-full p-6 pt-4">
             <Tabs defaultValue="general" orientation="vertical" className="flex w-full h-full">
               <TabsList className="flex flex-col h-full w-48 bg-gray-700 p-2 justify-start">
                 <TabsTrigger 
