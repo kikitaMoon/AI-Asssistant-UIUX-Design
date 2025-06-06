@@ -9,6 +9,7 @@ import { AppSidebar } from '../components/AppSidebar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Moon, Sun } from 'lucide-react';
 
 interface ChatMessage {
@@ -20,7 +21,7 @@ interface ChatMessage {
 
 const IndexContent = () => {
   const [message, setMessage] = useState('');
-  const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4']);
+  const [selectedModel, setSelectedModel] = useState('gpt-4'); // Changed to single model selection
   const [selectedServers, setSelectedServers] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
@@ -101,7 +102,7 @@ const IndexContent = () => {
       };
       setChatMessages(prev => [...prev, newMessage]);
       console.log('Sending message:', message);
-      console.log('Using models:', selectedModels);
+      console.log('Using model:', selectedModel);
       console.log('Selected servers:', selectedServers);
       setMessage('');
     }
@@ -166,12 +167,8 @@ const IndexContent = () => {
     console.log('Add new MCP server');
   };
 
-  const toggleModelSelection = (modelId: string) => {
-    setSelectedModels(prev => 
-      prev.includes(modelId) 
-        ? prev.filter(id => id !== modelId)
-        : [...prev, modelId]
-    );
+  const handleModelSelection = (modelId: string) => {
+    setSelectedModel(modelId);
   };
 
   const renderChatMessage = (msg: ChatMessage) => (
@@ -200,7 +197,8 @@ const IndexContent = () => {
           <Button
             onClick={handleNewChat}
             size="icon"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            variant="ghost"
+            className="text-gray-300 hover:bg-gray-700 hover:text-white"
           >
             <Plus className="w-4 h-4" />
           </Button>
@@ -222,7 +220,7 @@ const IndexContent = () => {
                   value="general" 
                   className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-2 py-3"
                 >
-                  General
+                  Theme
                 </TabsTrigger>
                 <TabsTrigger 
                   value="mcp" 
@@ -270,23 +268,20 @@ const IndexContent = () => {
                 <TabsContent value="llm" className="space-y-4 mt-0 h-full">
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold">Available Models</h3>
-                    {availableModels.map((model) => {
-                      const IconComponent = model.icon;
-                      return (
-                        <div key={model.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
-                          <div className="flex items-center gap-2">
-                            <IconComponent className={`w-4 h-4 ${model.color}`} />
-                            <span>{model.name}</span>
+                    <RadioGroup value={selectedModel} onValueChange={handleModelSelection}>
+                      {availableModels.map((model) => {
+                        const IconComponent = model.icon;
+                        return (
+                          <div key={model.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                            <div className="flex items-center gap-2">
+                              <IconComponent className={`w-4 h-4 ${model.color}`} />
+                              <span>{model.name}</span>
+                            </div>
+                            <RadioGroupItem value={model.id} />
                           </div>
-                          <input
-                            type="checkbox"
-                            checked={selectedModels.includes(model.id)}
-                            onChange={() => toggleModelSelection(model.id)}
-                            className="text-blue-600"
-                          />
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </RadioGroup>
                   </div>
                 </TabsContent>
               </div>
@@ -319,7 +314,7 @@ const IndexContent = () => {
                       <button
                         key={index}
                         onClick={() => handleSampleQuestion(item)}
-                        className="p-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-left transition-colors duration-200 border border-gray-600 flex flex-col items-start gap-3"
+                        className="p-4 bg-[#303030] hover:bg-gray-600 rounded-lg text-white text-left transition-colors duration-200 flex flex-col items-start gap-3"
                       >
                         <IconComponent className="w-6 h-6 text-blue-400" />
                         <span className="text-sm leading-relaxed">{item.text}</span>
@@ -340,7 +335,7 @@ const IndexContent = () => {
 
         {/* Input Container */}
         <div className="w-full max-w-4xl mx-auto">
-          <div className="relative bg-gray-800 rounded-2xl shadow-lg border border-gray-600 overflow-hidden transition-colors duration-300">
+          <div className="relative bg-[#303030] rounded-2xl shadow-lg overflow-hidden transition-colors duration-300">
             {/* Text Area */}
             <textarea
               value={message}
@@ -458,9 +453,9 @@ const IndexContent = () => {
                         title="Model Provider"
                       >
                         <Bot className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                        {selectedModels.length > 0 && (
+                        {selectedModel && (
                           <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                            {selectedModels.length}
+                            1
                           </span>
                         )}
                       </button>
@@ -470,23 +465,20 @@ const IndexContent = () => {
                         AI Models
                       </div>
                       <DropdownMenuSeparator />
-                      {availableModels.map((model) => {
-                        const IconComponent = model.icon;
-                        return (
-                          <DropdownMenuCheckboxItem
-                            key={model.id}
-                            checked={selectedModels.includes(model.id)}
-                            onCheckedChange={() => toggleModelSelection(model.id)}
-                            className="text-white"
-                            onSelect={(e) => e.preventDefault()}
-                          >
-                            <div className="flex items-center gap-2">
-                              <IconComponent className={`w-4 h-4 ${model.color}`} />
-                              <span>{model.name}</span>
+                      <RadioGroup value={selectedModel} onValueChange={handleModelSelection} className="p-2">
+                        {availableModels.map((model) => {
+                          const IconComponent = model.icon;
+                          return (
+                            <div key={model.id} className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded">
+                              <RadioGroupItem value={model.id} id={model.id} />
+                              <label htmlFor={model.id} className="flex items-center gap-2 cursor-pointer flex-1">
+                                <IconComponent className={`w-4 h-4 ${model.color}`} />
+                                <span className="text-white">{model.name}</span>
+                              </label>
                             </div>
-                          </DropdownMenuCheckboxItem>
-                        );
-                      })}
+                          );
+                        })}
+                      </RadioGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -510,18 +502,20 @@ const IndexContent = () => {
 };
 
 const Index = () => {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const handleNewChat = () => {
     // This will be handled by the IndexContent component
   };
 
   const handleSettingsClick = () => {
-    // This will be handled by the IndexContent component
+    setIsSettingsOpen(true);
   };
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar onNewChat={handleNewChat} onSettingsClick={() => {}} />
+        <AppSidebar onNewChat={handleNewChat} onSettingsClick={handleSettingsClick} />
         <SidebarInset>
           <IndexContent />
         </SidebarInset>
