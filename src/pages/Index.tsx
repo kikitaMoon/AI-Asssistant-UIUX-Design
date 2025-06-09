@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -24,6 +25,36 @@ interface IndexContentProps {
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
 }
+
+const mcpServers = [
+  {
+    id: 'server1',
+    name: 'Database Server',
+    status: 'connected' as const,
+    features: [
+      { id: 'feature1', name: 'Query Database' },
+      { id: 'feature2', name: 'Schema Analysis' }
+    ]
+  },
+  {
+    id: 'server2',
+    name: 'File System',
+    status: 'disconnected' as const,
+    features: [
+      { id: 'feature3', name: 'File Operations' },
+      { id: 'feature4', name: 'Directory Listing' }
+    ]
+  },
+  {
+    id: 'server3',
+    name: 'API Gateway',
+    status: 'connected' as const,
+    features: [
+      { id: 'feature5', name: 'REST API' },
+      { id: 'feature6', name: 'GraphQL' }
+    ]
+  }
+];
 
 const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) => {
   const [message, setMessage] = useState('');
