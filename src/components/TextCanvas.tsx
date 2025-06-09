@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Upload, X, Save, Type, Clipboard } from 'lucide-react';
+import { Upload, X, Type, Clipboard, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -11,9 +11,10 @@ interface TextCanvasProps {
   processedResult?: string;
   content: string;
   setContent: (content: string) => void;
+  children?: React.ReactNode; // For the bottom buttons
 }
 
-export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, content, setContent }: TextCanvasProps) => {
+export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, content, setContent, children }: TextCanvasProps) => {
   const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -48,7 +49,7 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
   if (!isOpen) return null;
 
   return (
-    <div className="bg-[#303030] rounded-b-2xl border-t border-gray-600 transition-all duration-300">
+    <div className="bg-[#303030] rounded-t-2xl border-b border-gray-600 transition-all duration-300">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-600">
         <div className="flex items-center gap-2">
@@ -103,7 +104,7 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
             className="text-gray-400 hover:text-red-400 hover:bg-gray-600 h-8 w-8"
             title="Clear"
           >
-            <X className="w-4 h-4" />
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
 
@@ -120,6 +121,13 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
           Supported formats: .txt, .md, .csv, .json, .xml, .log
         </div>
       </div>
+
+      {/* Bottom buttons area */}
+      {children && (
+        <div className="p-4 pt-0">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
