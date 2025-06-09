@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Upload, X, Save, Type, Send } from 'lucide-react';
+import { Upload, X, Save, Type, Clipboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -9,10 +9,11 @@ interface TextCanvasProps {
   onClose: () => void;
   onProcessText: (text: string) => void;
   processedResult?: string;
+  content: string;
+  setContent: (content: string) => void;
 }
 
-export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult }: TextCanvasProps) => {
-  const [content, setContent] = useState('');
+export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, content, setContent }: TextCanvasProps) => {
   const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -29,10 +30,13 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult }: 
     }
   };
 
-  const handleProcessText = () => {
-    if (content.trim()) {
-      onProcessText(content);
-      console.log('Processing text content:', content);
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setContent(text);
+      console.log('Text pasted from clipboard');
+    } catch (err) {
+      console.error('Failed to read clipboard:', err);
     }
   };
 
@@ -86,12 +90,11 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult }: 
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleProcessText}
-            disabled={!content.trim()}
-            className="text-gray-400 hover:text-white hover:bg-gray-600 disabled:text-gray-600 h-8 w-8"
-            title="Process Text"
+            onClick={handlePaste}
+            className="text-gray-400 hover:text-white hover:bg-gray-600 h-8 w-8"
+            title="Paste from Clipboard"
           >
-            <Send className="w-4 h-4" />
+            <Clipboard className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
@@ -112,19 +115,6 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult }: 
           className="min-h-[150px] bg-gray-800 border-gray-600 text-white placeholder-gray-400 resize-none"
           rows={6}
         />
-
-        {/* Processed Result Area */}
-        {processedResult && (
-          <div className="border-t border-gray-600 pt-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Save className="w-4 h-4 text-green-400" />
-              <span className="text-sm text-gray-300 font-medium">Processed Result:</span>
-            </div>
-            <div className="bg-gray-800 border border-gray-600 rounded-lg p-3 text-white text-sm whitespace-pre-wrap max-h-[200px] overflow-y-auto">
-              {processedResult}
-            </div>
-          </div>
-        )}
 
         <div className="text-xs text-gray-400">
           Supported formats: .txt, .md, .csv, .json, .xml, .log

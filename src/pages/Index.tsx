@@ -12,12 +12,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Moon, Sun } from 'lucide-react';
 import { TextCanvas } from '../components/TextCanvas';
+import { ProcessedTextResult } from '../components/ProcessedTextResult';
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  type?: 'text' | 'processed-result';
 }
 
 interface IndexContentProps {
@@ -57,13 +59,13 @@ const mcpServers = [
 
 const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) => {
   const [message, setMessage] = useState('');
+  const [canvasContent, setCanvasContent] = useState('');
   const [selectedModel, setSelectedModel] = useState('gpt-4');
   const [selectedServers, setSelectedServers] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isTextCanvasOpen, setIsTextCanvasOpen] = useState(false);
-  const [processedTextResult, setProcessedTextResult] = useState<string>('');
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -100,15 +102,35 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   ];
 
   const handleSend = () => {
-    if (message.trim()) {
+    const contentToSend = isTextCanvasOpen ? canvasContent : message;
+    
+    if (contentToSend.trim()) {
       const newMessage: ChatMessage = {
         id: Date.now().toString(),
         role: 'user',
-        content: message,
-        timestamp: new Date()
+        content: contentToSend,
+        timestamp: new Date(),
+        type: 'text'
       };
       setChatMessages(prev => [...prev, newMessage]);
-      console.log('Sending message:', message);
+      
+      // If canvas is open, process the text and add result to conversation
+      if (isTextCanvasOpen && canvasContent.trim()) {
+        const processedResult = `Processed text (${canvasContent.length} characters):\n\n${canvasContent}\n\n--- Analysis ---\nWord count: ${canvasContent.split(/\s+/).length}\nCharacter count: ${canvasContent.length}\nLines: ${canvasContent.split('\n').length}`;
+        
+        const resultMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: processedResult,
+          timestamp: new Date(),
+          type: 'processed-result'
+        };
+        
+        setChatMessages(prev => [...prev, resultMessage]);
+        setCanvasContent('');
+      }
+      
+      console.log('Sending message:', contentToSend);
       console.log('Using model:', selectedModel);
       console.log('Selected servers:', selectedServers);
       setMessage('');
@@ -127,14 +149,16 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       id: Date.now().toString(),
       role: 'user',
       content: question.text,
-      timestamp: new Date()
+      timestamp: new Date(),
+      type: 'text'
     };
     
     const assistantMessage: ChatMessage = {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
       content: question.sampleResponse,
-      timestamp: new Date()
+      timestamp: new Date(),
+      type: 'text'
     };
 
     setChatMessages([userMessage, assistantMessage]);
@@ -144,6 +168,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const handleNewChat = () => {
     setChatMessages([]);
     setMessage('');
+    setCanvasContent('');
     setIsTextCanvasOpen(false);
   };
 
@@ -185,28 +210,37 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   };
 
   const handleProcessText = (text: string) => {
-    // Simulate text processing
-    const processedResult = `Processed text (${text.length} characters):\n\n${text}\n\n--- Analysis ---\nWord count: ${text.split(/\s+/).length}\nCharacter count: ${text.length}\nLines: ${text.split('\n').length}`;
-    setProcessedTextResult(processedResult);
     console.log('Text processed:', text);
   };
 
-  const renderChatMessage = (msg: ChatMessage) => (
-    <div key={msg.id} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-      <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
-        msg.role === 'user' 
-          ? 'bg-blue-600 text-white' 
-          : 'bg-gray-700 text-gray-100'
-      }`}>
-        <div className="whitespace-pre-wrap">{msg.content}</div>
-        <div className={`text-xs mt-1 ${
-          msg.role === 'user' ? 'text-blue-100' : 'text-gray-400'
+  const renderChatMessage = (msg: ChatMessage) => {
+    if (msg.type === 'processed-result') {
+      return (
+        <ProcessedTextResult 
+          key={msg.id}
+          result={msg.content}
+          timestamp={msg.timestamp}
+        />
+      );
+    }
+
+    return (
+      <div key={msg.id} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+        <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+          msg.role === 'user' 
+            ? 'bg-blue-600 text-white' 
+            : 'bg-gray-700 text-gray-100'
         }`}>
-          {msg.timestamp.toLocaleTimeString()}
+          <div className="whitespace-pre-wrap">{msg.content}</div>
+          <div className={`text-xs mt-1 ${
+            msg.role === 'user' ? 'text-blue-100' : 'text-gray-400'
+          }`}>
+            {msg.timestamp.toLocaleTimeString()}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-black flex flex-col p-4 transition-colors duration-300 overflow-hidden">
@@ -356,28 +390,33 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
         {/* Input Container with Text Canvas */}
         <div className="w-full max-w-4xl mx-auto">
           <div className="relative bg-[#303030] rounded-2xl shadow-lg overflow-hidden transition-colors duration-300">
-            {/* Text Area */}
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message here..."
-              className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px] overflow-hidden"
-              rows={3}
-            />
+            {/* Main Input Area - Hidden when canvas is open */}
+            {!isTextCanvasOpen && (
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message here..."
+                className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px] overflow-hidden"
+                rows={3}
+              />
+            )}
 
             {/* Bottom Button Container */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 transition-colors duration-300">
+            <div className={`${isTextCanvasOpen ? 'relative' : 'absolute bottom-0 left-0 right-0'} p-4 transition-colors duration-300`}>
               <div className="flex items-center justify-between">
                 {/* Left aligned buttons */}
                 <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => console.log('Upload a file')}
-                    className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
-                    title="Upload a file"
-                  >
-                    <Upload className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                  </button>
+                  {/* Upload button - only visible when canvas is open */}
+                  {isTextCanvasOpen && (
+                    <button
+                      onClick={() => console.log('Upload a file')}
+                      className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                      title="Upload a file"
+                    >
+                      <Upload className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                    </button>
+                  )}
                   
                   <button
                     onClick={handleTextToEarth}
@@ -524,7 +563,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                 {/* Send button */}
                 <button
                   onClick={handleSend}
-                  disabled={!message.trim()}
+                  disabled={!(isTextCanvasOpen ? canvasContent.trim() : message.trim())}
                   className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
                   title="Send message"
                 >
@@ -538,7 +577,8 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
               isOpen={isTextCanvasOpen} 
               onClose={() => setIsTextCanvasOpen(false)}
               onProcessText={handleProcessText}
-              processedResult={processedTextResult}
+              content={canvasContent}
+              setContent={setCanvasContent}
             />
           </div>
         </div>
