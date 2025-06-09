@@ -128,6 +128,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
         
         setChatMessages(prev => [...prev, resultMessage]);
         setCanvasContent('');
+        setIsTextCanvasOpen(false);
       }
       
       console.log('Sending message:', contentToSend);
@@ -213,6 +214,11 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     console.log('Text processed:', text);
   };
 
+  const handleEditProcessedResult = (content: string) => {
+    setCanvasContent(content);
+    setIsTextCanvasOpen(true);
+  };
+
   const renderChatMessage = (msg: ChatMessage) => {
     if (msg.type === 'processed-result') {
       return (
@@ -220,6 +226,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
           key={msg.id}
           result={msg.content}
           timestamp={msg.timestamp}
+          onEdit={() => handleEditProcessedResult(msg.content)}
         />
       );
     }
@@ -390,48 +397,24 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
         {/* Input Container with Text Canvas */}
         <div className="w-full max-w-4xl mx-auto">
           <div className="relative bg-[#303030] rounded-2xl shadow-lg overflow-hidden transition-colors duration-300">
-            {/* Main Input Area - Hidden when canvas is open */}
-            {!isTextCanvasOpen && (
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message here..."
-                className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px] overflow-hidden"
-                rows={3}
-              />
-            )}
-
-            {/* Bottom Button Container */}
-            <div className={`${isTextCanvasOpen ? 'relative' : 'absolute bottom-0 left-0 right-0'} p-4 transition-colors duration-300`}>
+            {/* Text Canvas - Appears above the input area */}
+            <TextCanvas 
+              isOpen={isTextCanvasOpen} 
+              onClose={() => setIsTextCanvasOpen(false)}
+              onProcessText={handleProcessText}
+              content={canvasContent}
+              setContent={setCanvasContent}
+            >
+              {/* Bottom Button Container - moved inside TextCanvas */}
               <div className="flex items-center justify-between">
                 {/* Left aligned buttons */}
                 <div className="flex items-center space-x-3">
-                  {/* Upload button - only visible when canvas is open */}
-                  {isTextCanvasOpen && (
-                    <button
-                      onClick={() => console.log('Upload a file')}
-                      className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
-                      title="Upload a file"
-                    >
-                      <Upload className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                    </button>
-                  )}
-                  
                   <button
                     onClick={handleTextToEarth}
-                    className={`p-2 rounded-lg transition-colors duration-200 group ${
-                      isTextCanvasOpen 
-                        ? 'bg-blue-600 hover:bg-blue-700' 
-                        : 'hover:bg-gray-600'
-                    }`}
+                    className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors duration-200 group"
                     title="Text to Earth"
                   >
-                    <Earth className={`w-5 h-5 ${
-                      isTextCanvasOpen 
-                        ? 'text-white' 
-                        : 'text-gray-300 group-hover:text-blue-400'
-                    }`} />
+                    <Earth className="w-5 h-5 text-white" />
                   </button>
                   
                   <button
@@ -563,23 +546,64 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                 {/* Send button */}
                 <button
                   onClick={handleSend}
-                  disabled={!(isTextCanvasOpen ? canvasContent.trim() : message.trim())}
+                  disabled={!canvasContent.trim()}
                   className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
                   title="Send message"
                 >
                   <Send className="w-5 h-5 text-white" />
                 </button>
               </div>
-            </div>
+            </TextCanvas>
 
-            {/* Text Canvas - Extended from input box */}
-            <TextCanvas 
-              isOpen={isTextCanvasOpen} 
-              onClose={() => setIsTextCanvasOpen(false)}
-              onProcessText={handleProcessText}
-              content={canvasContent}
-              setContent={setCanvasContent}
-            />
+            {/* Main Input Area - Hidden when canvas is open */}
+            {!isTextCanvasOpen && (
+              <>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message here..."
+                  className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px] overflow-hidden"
+                  rows={3}
+                />
+
+                {/* Bottom Button Container for regular input */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 transition-colors duration-300">
+                  <div className="flex items-center justify-between">
+                    {/* Left aligned buttons */}
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={handleTextToEarth}
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                        title="Text to Earth"
+                      >
+                        <Earth className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                      </button>
+                      
+                      <button
+                        onClick={() => console.log('Take screenshot')}
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                        title="Take screenshot"
+                      >
+                        <Camera className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                      </button>
+                      
+                      {/* ... keep existing code (MCP Server and Model Provider dropdowns) */}
+                    </div>
+
+                    {/* Send button */}
+                    <button
+                      onClick={handleSend}
+                      disabled={!message.trim()}
+                      className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
+                      title="Send message"
+                    >
+                      <Send className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
