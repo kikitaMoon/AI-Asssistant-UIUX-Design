@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -58,12 +57,13 @@ const mcpServers = [
 
 const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) => {
   const [message, setMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState('gpt-4'); // Changed to single model selection
+  const [selectedModel, setSelectedModel] = useState('gpt-4');
   const [selectedServers, setSelectedServers] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isTextCanvasOpen, setIsTextCanvasOpen] = useState(false);
+  const [processedTextResult, setProcessedTextResult] = useState<string>('');
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -182,6 +182,13 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const handleTextToEarth = () => {
     setIsTextCanvasOpen(!isTextCanvasOpen);
     console.log('Text to Earth canvas toggled:', !isTextCanvasOpen);
+  };
+
+  const handleProcessText = (text: string) => {
+    // Simulate text processing
+    const processedResult = `Processed text (${text.length} characters):\n\n${text}\n\n--- Analysis ---\nWord count: ${text.split(/\s+/).length}\nCharacter count: ${text.length}\nLines: ${text.split('\n').length}`;
+    setProcessedTextResult(processedResult);
+    console.log('Text processed:', text);
   };
 
   const renderChatMessage = (msg: ChatMessage) => (
@@ -346,12 +353,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
           </div>
         )}
 
-        {/* Text Canvas */}
-        <div className="w-full max-w-4xl mx-auto">
-          <TextCanvas isOpen={isTextCanvasOpen} onClose={() => setIsTextCanvasOpen(false)} />
-        </div>
-
-        {/* Input Container */}
+        {/* Input Container with Text Canvas */}
         <div className="w-full max-w-4xl mx-auto">
           <div className="relative bg-[#303030] rounded-2xl shadow-lg overflow-hidden transition-colors duration-300">
             {/* Text Area */}
@@ -530,6 +532,14 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                 </button>
               </div>
             </div>
+
+            {/* Text Canvas - Extended from input box */}
+            <TextCanvas 
+              isOpen={isTextCanvasOpen} 
+              onClose={() => setIsTextCanvasOpen(false)}
+              onProcessText={handleProcessText}
+              processedResult={processedTextResult}
+            />
           </div>
         </div>
       </div>
