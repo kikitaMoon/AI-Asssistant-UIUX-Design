@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus } from 'lucide-react';
+import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -12,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Moon, Sun } from 'lucide-react';
+import { TextCanvas } from '../components/TextCanvas';
 
 interface ChatMessage {
   id: string;
@@ -32,37 +32,8 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [mcpServers] = useState([
-    { 
-      id: 'server1', 
-      name: 'Development Server', 
-      status: 'connected',
-      features: [
-        { id: 'dev-db', name: 'Database Access' },
-        { id: 'dev-api', name: 'API Testing' },
-        { id: 'dev-logs', name: 'Log Analysis' }
-      ]
-    },
-    { 
-      id: 'server2', 
-      name: 'Production Server', 
-      status: 'connected',
-      features: [
-        { id: 'prod-monitor', name: 'System Monitoring' },
-        { id: 'prod-deploy', name: 'Deployment' },
-        { id: 'prod-backup', name: 'Backup Management' }
-      ]
-    },
-    { 
-      id: 'server3', 
-      name: 'Testing Server', 
-      status: 'disconnected',
-      features: [
-        { id: 'test-suite', name: 'Test Suite' },
-        { id: 'test-coverage', name: 'Coverage Reports' }
-      ]
-    }
-  ]);
+  const [isTextCanvasOpen, setIsTextCanvasOpen] = useState(false);
+  
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
 
@@ -142,6 +113,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const handleNewChat = () => {
     setChatMessages([]);
     setMessage('');
+    setIsTextCanvasOpen(false);
   };
 
   const toggleServerSelection = (serverId: string) => {
@@ -174,6 +146,11 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
 
   const handleModelSelection = (modelId: string) => {
     setSelectedModel(modelId);
+  };
+
+  const handleTextToEarth = () => {
+    setIsTextCanvasOpen(!isTextCanvasOpen);
+    console.log('Text to Earth canvas toggled:', !isTextCanvasOpen);
   };
 
   const renderChatMessage = (msg: ChatMessage) => (
@@ -213,12 +190,12 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
         <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-6xl w-[80vw] h-[80vh] max-h-[80vh] p-0">
-          <DialogHeader className="p-6 pb-0">
-            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+          <DialogHeader className="px-6 pt-3 pb-0">
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Settings
             </DialogTitle>
           </DialogHeader>
-          <div className="flex h-full p-6 pt-4">
+          <div className="flex h-full px-6 pb-6 pt-2">
             <Tabs defaultValue="general" orientation="vertical" className="flex w-full h-full">
               <TabsList className="flex flex-col h-full w-48 bg-gray-700 p-2 justify-start">
                 <TabsTrigger 
@@ -338,6 +315,11 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
           </div>
         )}
 
+        {/* Text Canvas */}
+        <div className="w-full max-w-4xl mx-auto">
+          <TextCanvas isOpen={isTextCanvasOpen} onClose={() => setIsTextCanvasOpen(false)} />
+        </div>
+
         {/* Input Container */}
         <div className="w-full max-w-4xl mx-auto">
           <div className="relative bg-[#303030] rounded-2xl shadow-lg overflow-hidden transition-colors duration-300">
@@ -365,6 +347,22 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                   </button>
                   
                   <button
+                    onClick={handleTextToEarth}
+                    className={`p-2 rounded-lg transition-colors duration-200 group ${
+                      isTextCanvasOpen 
+                        ? 'bg-blue-600 hover:bg-blue-700' 
+                        : 'hover:bg-gray-600'
+                    }`}
+                    title="Text to Earth"
+                  >
+                    <Earth className={`w-5 h-5 ${
+                      isTextCanvasOpen 
+                        ? 'text-white' 
+                        : 'text-gray-300 group-hover:text-blue-400'
+                    }`} />
+                  </button>
+                  
+                  <button
                     onClick={() => console.log('Take screenshot')}
                     className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
                     title="Take screenshot"
@@ -372,6 +370,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                     <Camera className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
                   </button>
                   
+                  {/* MCP Server dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
@@ -451,6 +450,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                     </DropdownMenuContent>
                   </DropdownMenu>
 
+                  {/* Model Provider dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
