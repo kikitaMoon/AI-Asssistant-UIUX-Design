@@ -171,7 +171,6 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     setMessage('');
     setCanvasContent('');
     setIsTextCanvasOpen(false);
-    console.log('New chat started from top level');
   };
 
   const toggleServerSelection = (serverId: string) => {
@@ -236,11 +235,13 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       <div key={msg.id} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
         <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
           msg.role === 'user' 
-            ? 'bg-primary text-primary-foreground' 
-            : 'bg-muted text-muted-foreground'
+            ? 'bg-blue-600 text-white' 
+            : 'bg-gray-700 text-gray-100'
         }`}>
           <div className="whitespace-pre-wrap">{msg.content}</div>
-          <div className={`text-xs mt-1 opacity-70`}>
+          <div className={`text-xs mt-1 ${
+            msg.role === 'user' ? 'text-blue-100' : 'text-gray-400'
+          }`}>
             {msg.timestamp.toLocaleTimeString()}
           </div>
         </div>
@@ -249,7 +250,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col p-4 transition-colors duration-300 overflow-hidden">
+    <div className="min-h-screen bg-black flex flex-col p-4 transition-colors duration-300 overflow-hidden">
       {/* Top bar with sidebar trigger and new chat button */}
       <div className="mb-4 flex justify-between items-center">
         <SidebarTrigger />
@@ -258,7 +259,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
             onClick={handleNewChat}
             size="icon"
             variant="ghost"
-            className="text-muted-foreground hover:bg-accent hover:text-foreground"
+            className="text-gray-300 hover:bg-gray-700 hover:text-white"
           >
             <Plus className="w-4 h-4" />
           </Button>
@@ -267,7 +268,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
 
       {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="bg-card text-card-foreground border-border max-w-6xl w-[80vw] h-[80vh] max-h-[80vh] p-0">
+        <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-6xl w-[80vw] h-[80vh] max-h-[80vh] p-0">
           <DialogHeader className="px-6 pt-3 pb-0">
             <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Settings
@@ -275,22 +276,22 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
           </DialogHeader>
           <div className="flex h-full px-6 pb-6 pt-2">
             <Tabs defaultValue="general" orientation="vertical" className="flex w-full h-full">
-              <TabsList className="flex flex-col h-full w-48 bg-muted p-2 justify-start">
+              <TabsList className="flex flex-col h-full w-48 bg-gray-700 p-2 justify-start">
                 <TabsTrigger 
                   value="general" 
-                  className="w-full justify-start text-foreground data-[state=active]:bg-accent mb-2 py-3"
+                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-2 py-3"
                 >
                   Theme
                 </TabsTrigger>
                 <TabsTrigger 
                   value="mcp" 
-                  className="w-full justify-start text-foreground data-[state=active]:bg-accent mb-2 py-3"
+                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-2 py-3"
                 >
                   MCP Server
                 </TabsTrigger>
                 <TabsTrigger 
                   value="llm" 
-                  className="w-full justify-start text-foreground data-[state=active]:bg-accent py-3"
+                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 py-3"
                 >
                   LLM Model Provider
                 </TabsTrigger>
@@ -303,7 +304,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                       variant="ghost"
                       size="icon"
                       onClick={toggleTheme}
-                      className="text-foreground hover:bg-accent"
+                      className="text-white hover:bg-gray-700"
                     >
                       {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                     </Button>
@@ -313,14 +314,14 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold">MCP Servers</h3>
                     {mcpServers.map((server) => (
-                      <div key={server.id} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <div key={server.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
                         <div className="flex items-center gap-2">
                           <div className={`w-2 h-2 rounded-full ${
                             server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
                           }`} />
                           <span>{server.name}</span>
                         </div>
-                        <span className="text-sm text-muted-foreground">{server.status}</span>
+                        <span className="text-sm text-gray-400">{server.status}</span>
                       </div>
                     ))}
                   </div>
@@ -332,7 +333,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                       {availableModels.map((model) => {
                         const IconComponent = model.icon;
                         return (
-                          <div key={model.id} className="flex items-center justify-between p-2 bg-muted rounded">
+                          <div key={model.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
                             <div className="flex items-center gap-2">
                               <IconComponent className={`w-4 h-4 ${model.color}`} />
                               <span>{model.name}</span>
@@ -360,7 +361,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
                   Hello, Sharon
                 </h1>
-                <p className="text-muted-foreground text-lg">
+                <p className="text-gray-400 text-lg">
                   How can I help you today?
                 </p>
               </div>
@@ -374,7 +375,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                       <button
                         key={index}
                         onClick={() => handleSampleQuestion(item)}
-                        className="p-4 bg-card hover:bg-accent text-card-foreground text-left transition-colors duration-200 flex flex-col items-start gap-3 rounded-lg border border-border/20"
+                        className="p-4 bg-[#303030] hover:bg-gray-600 rounded-lg text-white text-left transition-colors duration-200 flex flex-col items-start gap-3"
                       >
                         <IconComponent className="w-6 h-6 text-blue-400" />
                         <span className="text-sm leading-relaxed">{item.text}</span>
@@ -394,57 +395,44 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
         )}
 
         {/* Input Container with Text Canvas */}
-        <div className="w-full max-w-4xl mx-auto relative">
-          {/* Text Canvas - positioned absolutely above input */}
-          <TextCanvas 
-            isOpen={isTextCanvasOpen} 
-            onClose={() => setIsTextCanvasOpen(false)}
-            onProcessText={handleProcessText}
-            content={canvasContent}
-            setContent={setCanvasContent}
-          />
-
-          {/* Main Input Area */}
-          <div className="bg-card rounded-2xl shadow-lg border border-border/20 overflow-hidden transition-colors duration-300">
-            <textarea
-              value={isTextCanvasOpen ? canvasContent : message}
-              onChange={(e) => isTextCanvasOpen ? setCanvasContent(e.target.value) : setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={isTextCanvasOpen ? "Canvas content..." : "Type your message here..."}
-              className="w-full p-6 pb-20 resize-none border-none outline-none text-foreground placeholder-muted-foreground text-lg bg-transparent h-[100px] overflow-hidden"
-              rows={3}
-              disabled={isTextCanvasOpen}
-            />
-
-            {/* Bottom Button Container */}
-            <div className="absolute bottom-0 left-0 right-0 p-4">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="relative bg-[#303030] rounded-2xl shadow-lg overflow-hidden transition-colors duration-300">
+            {/* Text Canvas - Appears above the input area */}
+            <TextCanvas 
+              isOpen={isTextCanvasOpen} 
+              onClose={() => setIsTextCanvasOpen(false)}
+              onProcessText={handleProcessText}
+              content={canvasContent}
+              setContent={setCanvasContent}
+            >
+              {/* Bottom Button Container - moved inside TextCanvas */}
               <div className="flex items-center justify-between">
                 {/* Left aligned buttons */}
                 <div className="flex items-center space-x-3">
                   <button
                     onClick={handleTextToEarth}
-                    className="p-2 rounded-lg hover:bg-accent transition-colors duration-200 group"
+                    className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors duration-200 group"
                     title="Text to Earth"
                   >
-                    <Earth className="w-5 h-5 text-muted-foreground group-hover:text-blue-400" />
+                    <Earth className="w-5 h-5 text-white" />
                   </button>
                   
                   <button
                     onClick={() => console.log('Take screenshot')}
-                    className="p-2 rounded-lg hover:bg-accent transition-colors duration-200 group"
+                    className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
                     title="Take screenshot"
                   >
-                    <Camera className="w-5 h-5 text-muted-foreground group-hover:text-blue-400" />
+                    <Camera className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
                   </button>
                   
                   {/* MCP Server dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className="p-2 rounded-lg hover:bg-accent transition-colors duration-200 group relative"
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
                         title="MCP Server"
                       >
-                        <Server className="w-5 h-5 text-muted-foreground group-hover:text-blue-400" />
+                        <Server className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
                         {(selectedServers.length > 0 || selectedFeatures.length > 0) && (
                           <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                             {selectedServers.length + selectedFeatures.length}
@@ -452,8 +440,8 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                         )}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto bg-popover border-border">
-                      <div className="px-2 py-1.5 text-sm font-semibold text-popover-foreground">
+                    <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto bg-gray-800 border-gray-700">
+                      <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
                         MCP Servers
                       </div>
                       <DropdownMenuSeparator />
@@ -467,7 +455,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                               <DropdownMenuCheckboxItem
                                 checked={selectedServers.includes(server.id)}
                                 onCheckedChange={() => toggleServerSelection(server.id)}
-                                className="flex items-center justify-between flex-1 pr-2 text-popover-foreground"
+                                className="flex items-center justify-between flex-1 pr-2 text-white"
                                 onSelect={(e) => e.preventDefault()}
                               >
                                 <div className="flex items-center gap-2">
@@ -479,16 +467,16 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                               </DropdownMenuCheckboxItem>
                               <CollapsibleTrigger asChild>
                                 <button 
-                                  className="p-1 hover:bg-accent rounded"
+                                  className="p-1 hover:bg-gray-700 rounded"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     toggleServerExpansion(server.id);
                                   }}
                                 >
                                   {expandedServers.includes(server.id) ? (
-                                    <ChevronDown className="w-4 h-4 text-popover-foreground" />
+                                    <ChevronDown className="w-4 h-4 text-white" />
                                   ) : (
-                                    <ChevronRight className="w-4 h-4 text-popover-foreground" />
+                                    <ChevronRight className="w-4 h-4 text-white" />
                                   )}
                                 </button>
                               </CollapsibleTrigger>
@@ -499,7 +487,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                                   key={feature.id}
                                   checked={selectedFeatures.includes(feature.id)}
                                   onCheckedChange={() => toggleFeatureSelection(feature.id)}
-                                  className="text-sm text-popover-foreground"
+                                  className="text-sm text-white"
                                   onSelect={(e) => e.preventDefault()}
                                 >
                                   {feature.name}
@@ -510,7 +498,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                         </div>
                       ))}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2 text-popover-foreground">
+                      <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2 text-white">
                         <Plus className="w-4 h-4" />
                         Add New Server
                       </DropdownMenuItem>
@@ -521,10 +509,10 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className="p-2 rounded-lg hover:bg-accent transition-colors duration-200 group relative"
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
                         title="Model Provider"
                       >
-                        <Bot className="w-5 h-5 text-muted-foreground group-hover:text-blue-400" />
+                        <Bot className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
                         {selectedModel && (
                           <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                             1
@@ -532,8 +520,8 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                         )}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-64 bg-popover border-border">
-                      <div className="px-2 py-1.5 text-sm font-semibold text-popover-foreground">
+                    <DropdownMenuContent align="start" className="w-64 bg-gray-800 border-gray-700">
+                      <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
                         AI Models
                       </div>
                       <DropdownMenuSeparator />
@@ -541,11 +529,11 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                         {availableModels.map((model) => {
                           const IconComponent = model.icon;
                           return (
-                            <div key={model.id} className="flex items-center space-x-2 p-2 hover:bg-accent rounded">
+                            <div key={model.id} className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded">
                               <RadioGroupItem value={model.id} id={model.id} />
                               <label htmlFor={model.id} className="flex items-center gap-2 cursor-pointer flex-1">
                                 <IconComponent className={`w-4 h-4 ${model.color}`} />
-                                <span className="text-popover-foreground">{model.name}</span>
+                                <span className="text-white">{model.name}</span>
                               </label>
                             </div>
                           );
@@ -558,14 +546,64 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                 {/* Send button */}
                 <button
                   onClick={handleSend}
-                  disabled={!(isTextCanvasOpen ? canvasContent.trim() : message.trim())}
-                  className="p-2 rounded-lg bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed transition-colors duration-200 group"
+                  disabled={!canvasContent.trim()}
+                  className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
                   title="Send message"
                 >
-                  <Send className="w-5 h-5 text-primary-foreground" />
+                  <Send className="w-5 h-5 text-white" />
                 </button>
               </div>
-            </div>
+            </TextCanvas>
+
+            {/* Main Input Area - Hidden when canvas is open */}
+            {!isTextCanvasOpen && (
+              <>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message here..."
+                  className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px] overflow-hidden"
+                  rows={3}
+                />
+
+                {/* Bottom Button Container for regular input */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 transition-colors duration-300">
+                  <div className="flex items-center justify-between">
+                    {/* Left aligned buttons */}
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={handleTextToEarth}
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                        title="Text to Earth"
+                      >
+                        <Earth className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                      </button>
+                      
+                      <button
+                        onClick={() => console.log('Take screenshot')}
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                        title="Take screenshot"
+                      >
+                        <Camera className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                      </button>
+                      
+                      {/* ... keep existing code (MCP Server and Model Provider dropdowns) */}
+                    </div>
+
+                    {/* Send button */}
+                    <button
+                      onClick={handleSend}
+                      disabled={!message.trim()}
+                      className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
+                      title="Send message"
+                    >
+                      <Send className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -577,7 +615,7 @@ const Index = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleNewChat = () => {
-    console.log('New chat started from top level');
+    console.log('New chat started');
   };
 
   const handleSettingsClick = () => {

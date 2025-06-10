@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MessageSquare, Plus, Settings, History } from 'lucide-react';
 import {
@@ -33,18 +34,13 @@ export function AppSidebar({ onNewChat, onSettingsClick }: AppSidebarProps) {
     // This would typically load the selected conversation
   };
 
-  const handleNewChatClick = () => {
-    console.log('New chat clicked from sidebar');
-    onNewChat();
-  };
-
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
-              onClick={handleNewChatClick}
+              onClick={onNewChat}
               className="w-full justify-start bg-sidebar-accent hover:bg-sidebar-accent/80"
             >
               <Plus className="w-4 h-4" />

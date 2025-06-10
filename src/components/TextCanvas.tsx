@@ -11,9 +11,10 @@ interface TextCanvasProps {
   processedResult?: string;
   content: string;
   setContent: (content: string) => void;
+  children?: React.ReactNode; // For the bottom buttons
 }
 
-export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, content, setContent }: TextCanvasProps) => {
+export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, content, setContent, children }: TextCanvasProps) => {
   const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -48,21 +49,21 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
   if (!isOpen) return null;
 
   return (
-    <div className="absolute bottom-full left-0 right-0 bg-[#2a2a2a] rounded-t-2xl border border-border/20 mb-2 transition-all duration-300 shadow-xl">
+    <div className="bg-[#303030] rounded-t-2xl border-b border-gray-600 transition-all duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border/20">
+      <div className="flex items-center justify-between p-4 border-b border-gray-600">
         <div className="flex items-center gap-2">
           <Type className="w-5 h-5 text-blue-400" />
-          <h3 className="text-foreground font-medium">Text to Earth Canvas</h3>
+          <h3 className="text-white font-medium">Text to Earth Canvas</h3>
           {fileName && (
-            <span className="text-sm text-muted-foreground">({fileName})</span>
+            <span className="text-sm text-gray-400">({fileName})</span>
           )}
         </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="text-muted-foreground hover:text-foreground hover:bg-accent h-8 w-8"
+          className="text-gray-400 hover:text-white hover:bg-gray-600 h-8 w-8"
         >
           <X className="w-4 h-4" />
         </Button>
@@ -82,7 +83,7 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
             variant="ghost"
             size="icon"
             onClick={() => fileInputRef.current?.click()}
-            className="text-muted-foreground hover:text-foreground hover:bg-accent h-8 w-8"
+            className="text-gray-400 hover:text-white hover:bg-gray-600 h-8 w-8"
             title="Upload Text File"
           >
             <Upload className="w-4 h-4" />
@@ -91,7 +92,7 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
             variant="ghost"
             size="icon"
             onClick={handlePaste}
-            className="text-muted-foreground hover:text-foreground hover:bg-accent h-8 w-8"
+            className="text-gray-400 hover:text-white hover:bg-gray-600 h-8 w-8"
             title="Paste from Clipboard"
           >
             <Clipboard className="w-4 h-4" />
@@ -100,7 +101,7 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
             variant="ghost"
             size="icon"
             onClick={handleClear}
-            className="text-muted-foreground hover:text-red-400 hover:bg-accent h-8 w-8"
+            className="text-gray-400 hover:text-red-400 hover:bg-gray-600 h-8 w-8"
             title="Clear"
           >
             <Trash2 className="w-4 h-4" />
@@ -112,14 +113,21 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Type, paste, or upload your text content here..."
-          className="min-h-[150px] bg-background border-border text-foreground placeholder-muted-foreground resize-none"
+          className="min-h-[150px] bg-gray-800 border-gray-600 text-white placeholder-gray-400 resize-none"
           rows={6}
         />
 
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-gray-400">
           Supported formats: .txt, .md, .csv, .json, .xml, .log
         </div>
       </div>
+
+      {/* Bottom buttons area */}
+      {children && (
+        <div className="p-4 pt-0">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
