@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth, Map } from 'lucide-react';
+import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -13,8 +14,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Moon, Sun } from 'lucide-react';
 import { TextCanvas } from '../components/TextCanvas';
 import { ProcessedTextResult } from '../components/ProcessedTextResult';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { MapPanel } from '../components/MapPanel';
 
 interface ChatMessage {
   id: string;
@@ -68,7 +67,6 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isTextCanvasOpen, setIsTextCanvasOpen] = useState(false);
-  const [isMapExpanded, setIsMapExpanded] = useState(false);
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -253,9 +251,9 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col transition-colors duration-300 overflow-hidden">
+    <div className="min-h-screen bg-black flex flex-col p-4 transition-colors duration-300 overflow-hidden">
       {/* Top bar with sidebar trigger and new chat button */}
-      <div className="p-4 flex justify-between items-center border-b border-gray-800">
+      <div className="mb-4 flex justify-between items-center">
         <SidebarTrigger />
         {(!sidebarOpen || isMobile) && (
           <Button
@@ -354,413 +352,376 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
         </DialogContent>
       </Dialog>
 
-      {/* Main content area with resizable panels */}
-      <div className="flex-1 overflow-hidden">
-        <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Main Chat Panel */}
-          <ResizablePanel defaultSize={isMapExpanded ? 75 : 100} minSize={50}>
-            <div className="h-full flex flex-col p-4">
-              {chatMessages.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="w-full max-w-4xl">
-                    {/* Welcome Message */}
-                    <div className="text-center mb-8">
-                      <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
-                        Hello, Sharon
-                      </h1>
-                      <p className="text-gray-400 text-lg">
-                        How can I help you today?
-                      </p>
-                    </div>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {chatMessages.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="w-full max-w-4xl">
+              {/* Welcome Message */}
+              <div className="text-center mb-8">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
+                  Hello, Sharon
+                </h1>
+                <p className="text-gray-400 text-lg">
+                  How can I help you today?
+                </p>
+              </div>
 
-                    {/* Sample Questions with Icons */}
-                    <div className="text-center mb-8">
-                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                        {sampleQuestions.map((item, index) => {
-                          const IconComponent = item.icon;
-                          return (
-                            <button
-                              key={index}
-                              onClick={() => handleSampleQuestion(item)}
-                              className="p-4 bg-[#303030] hover:bg-gray-600 rounded-lg text-white text-left transition-colors duration-200 flex flex-col items-start gap-3"
-                            >
-                              <IconComponent className="w-6 h-6 text-blue-400" />
-                              <span className="text-sm leading-relaxed">{item.text}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex-1 mb-4 overflow-y-auto scrollbar-hide">
-                  <div className="max-w-4xl mx-auto p-4">
-                    {chatMessages.map(renderChatMessage)}
-                  </div>
-                </div>
-              )}
-
-              {/* Input Container with Text Canvas */}
-              <div className="w-full max-w-4xl mx-auto">
-                <div className="relative bg-[#303030] rounded-2xl shadow-lg overflow-hidden transition-colors duration-300">
-                  {/* Text Canvas */}
-                  <TextCanvas 
-                    isOpen={isTextCanvasOpen} 
-                    onClose={() => setIsTextCanvasOpen(false)}
-                    onProcessText={handleProcessText}
-                    content={canvasContent}
-                    setContent={setCanvasContent}
-                  >
-                    {/* Bottom Button Container - inside TextCanvas */}
-                    <div className="flex items-center justify-between">
-                      {/* Left aligned buttons */}
-                      <div className="flex items-center space-x-3">
-                        <button
-                          onClick={handleTextToEarth}
-                          className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
-                          title="Text to Earth"
-                        >
-                          <Earth className="w-5 h-5 text-white" />
-                        </button>
-                        
-                        <button
-                          onClick={() => console.log('Take screenshot')}
-                          className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
-                          title="Take screenshot"
-                        >
-                          <Camera className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                        </button>
-                        
-                        {/* MCP Server dropdown */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
-                              title="MCP Server"
-                            >
-                              <Server className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                              {(selectedServers.length > 0 || selectedFeatures.length > 0) && (
-                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                                  {selectedServers.length + selectedFeatures.length}
-                                </span>
-                              )}
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto bg-gray-800 border-gray-700">
-                            <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
-                              MCP Servers
-                            </div>
-                            <DropdownMenuSeparator />
-                            {mcpServers.map((server) => (
-                              <div key={server.id}>
-                                <Collapsible 
-                                  open={expandedServers.includes(server.id)}
-                                  onOpenChange={() => toggleServerExpansion(server.id)}
-                                >
-                                  <div className="flex items-center">
-                                    <DropdownMenuCheckboxItem
-                                      checked={selectedServers.includes(server.id)}
-                                      onCheckedChange={() => toggleServerSelection(server.id)}
-                                      className="flex items-center justify-between flex-1 pr-2 text-white"
-                                      onSelect={(e) => e.preventDefault()}
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full ${
-                                          server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
-                                        }`} />
-                                        <span>{server.name}</span>
-                                      </div>
-                                    </DropdownMenuCheckboxItem>
-                                    <CollapsibleTrigger asChild>
-                                      <button 
-                                        className="p-1 hover:bg-gray-700 rounded"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleServerExpansion(server.id);
-                                        }}
-                                      >
-                                        {expandedServers.includes(server.id) ? (
-                                          <ChevronDown className="w-4 h-4 text-white" />
-                                        ) : (
-                                          <ChevronRight className="w-4 h-4 text-white" />
-                                        )}
-                                      </button>
-                                    </CollapsibleTrigger>
-                                  </div>
-                                  <CollapsibleContent className="pl-6">
-                                    {server.features.map((feature) => (
-                                      <DropdownMenuCheckboxItem
-                                        key={feature.id}
-                                        checked={selectedFeatures.includes(feature.id)}
-                                        onCheckedChange={() => toggleFeatureSelection(feature.id)}
-                                        className="text-sm text-white"
-                                        onSelect={(e) => e.preventDefault()}
-                                      >
-                                        {feature.name}
-                                      </DropdownMenuCheckboxItem>
-                                    ))}
-                                  </CollapsibleContent>
-                                </Collapsible>
-                              </div>
-                            ))}
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2 text-white">
-                              <Plus className="w-4 h-4" />
-                              Add New Server
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* Model Provider dropdown */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
-                              title="Model Provider"
-                            >
-                              <Bot className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                              {selectedModel && (
-                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                                  1
-                                </span>
-                              )}
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-64 bg-gray-800 border-gray-700">
-                            <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
-                              AI Models
-                            </div>
-                            <DropdownMenuSeparator />
-                            <RadioGroup value={selectedModel} onValueChange={handleModelSelection} className="p-2">
-                              {availableModels.map((model) => {
-                                const IconComponent = model.icon;
-                                return (
-                                  <div key={model.id} className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded">
-                                    <RadioGroupItem value={model.id} id={model.id} />
-                                    <label htmlFor={model.id} className="flex items-center gap-2 cursor-pointer flex-1">
-                                      <IconComponent className={`w-4 h-4 ${model.color}`} />
-                                      <span className="text-white">{model.name}</span>
-                                    </label>
-                                  </div>
-                                );
-                              })}
-                            </RadioGroup>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-
-                      {/* Send button */}
+              {/* Sample Questions with Icons */}
+              <div className="text-center mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                  {sampleQuestions.map((item, index) => {
+                    const IconComponent = item.icon;
+                    return (
                       <button
-                        onClick={handleSend}
-                        disabled={!message.trim()}
-                        className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
-                        title="Send message"
+                        key={index}
+                        onClick={() => handleSampleQuestion(item)}
+                        className="p-4 bg-[#303030] hover:bg-gray-600 rounded-lg text-white text-left transition-colors duration-200 flex flex-col items-start gap-3"
                       >
-                        <Send className="w-5 h-5 text-white" />
+                        <IconComponent className="w-6 h-6 text-blue-400" />
+                        <span className="text-sm leading-relaxed">{item.text}</span>
                       </button>
-                    </div>
-                  </TextCanvas>
-
-                  {/* Main Input Area - Hidden when canvas is open */}
-                  {!isTextCanvasOpen && (
-                    <>
-                      <textarea
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Type your message here..."
-                        className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px] overflow-hidden"
-                        rows={3}
-                      />
-
-                      {/* Bottom Button Container for regular input */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 transition-colors duration-300">
-                        <div className="flex items-center justify-between">
-                          {/* Left aligned buttons */}
-                          <div className="flex items-center space-x-3">
-                            <button
-                              onClick={handleTextToEarth}
-                              className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
-                              title="Text to Earth"
-                            >
-                              <Earth className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                            </button>
-                            
-                            <button
-                              onClick={() => console.log('Take screenshot')}
-                              className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
-                              title="Take screenshot"
-                            >
-                              <Camera className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                            </button>
-                            
-                            {/* MCP Server dropdown */}
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button
-                                  className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
-                                  title="MCP Server"
-                                >
-                                  <Server className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                                  {(selectedServers.length > 0 || selectedFeatures.length > 0) && (
-                                    <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                                      {selectedServers.length + selectedFeatures.length}
-                                    </span>
-                                  )}
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto bg-gray-800 border-gray-700">
-                                <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
-                                  MCP Servers
-                                </div>
-                                <DropdownMenuSeparator />
-                                {mcpServers.map((server) => (
-                                  <div key={server.id}>
-                                    <Collapsible 
-                                      open={expandedServers.includes(server.id)}
-                                      onOpenChange={() => toggleServerExpansion(server.id)}
-                                    >
-                                      <div className="flex items-center">
-                                        <DropdownMenuCheckboxItem
-                                          checked={selectedServers.includes(server.id)}
-                                          onCheckedChange={() => toggleServerSelection(server.id)}
-                                          className="flex items-center justify-between flex-1 pr-2 text-white"
-                                          onSelect={(e) => e.preventDefault()}
-                                        >
-                                          <div className="flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${
-                                              server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
-                                            }`} />
-                                            <span>{server.name}</span>
-                                          </div>
-                                        </DropdownMenuCheckboxItem>
-                                        <CollapsibleTrigger asChild>
-                                          <button 
-                                            className="p-1 hover:bg-gray-700 rounded"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              toggleServerExpansion(server.id);
-                                            }}
-                                          >
-                                            {expandedServers.includes(server.id) ? (
-                                              <ChevronDown className="w-4 h-4 text-white" />
-                                            ) : (
-                                              <ChevronRight className="w-4 h-4 text-white" />
-                                            )}
-                                          </button>
-                                        </CollapsibleTrigger>
-                                      </div>
-                                      <CollapsibleContent className="pl-6">
-                                        {server.features.map((feature) => (
-                                          <DropdownMenuCheckboxItem
-                                            key={feature.id}
-                                            checked={selectedFeatures.includes(feature.id)}
-                                            onCheckedChange={() => toggleFeatureSelection(feature.id)}
-                                            className="text-sm text-white"
-                                            onSelect={(e) => e.preventDefault()}
-                                          >
-                                            {feature.name}
-                                          </DropdownMenuCheckboxItem>
-                                        ))}
-                                      </CollapsibleContent>
-                                    </Collapsible>
-                                  </div>
-                                ))}
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2 text-white">
-                                  <Plus className="w-4 h-4" />
-                                  Add New Server
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-
-                            {/* Model Provider dropdown */}
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button
-                                  className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
-                                  title="Model Provider"
-                                >
-                                  <Bot className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
-                                  {selectedModel && (
-                                    <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                                      1
-                                    </span>
-                                  )}
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="start" className="w-64 bg-gray-800 border-gray-700">
-                                <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
-                                  AI Models
-                                </div>
-                                <DropdownMenuSeparator />
-                                <RadioGroup value={selectedModel} onValueChange={handleModelSelection} className="p-2">
-                                  {availableModels.map((model) => {
-                                    const IconComponent = model.icon;
-                                    return (
-                                      <div key={model.id} className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded">
-                                        <RadioGroupItem value={model.id} id={model.id} />
-                                        <label htmlFor={model.id} className="flex items-center gap-2 cursor-pointer flex-1">
-                                          <IconComponent className={`w-4 h-4 ${model.color}`} />
-                                          <span className="text-white">{model.name}</span>
-                                        </label>
-                                      </div>
-                                    );
-                                  })}
-                                </RadioGroup>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-
-                          {/* Send button */}
-                          <button
-                            onClick={handleSend}
-                            disabled={!message.trim()}
-                            className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
-                            title="Send message"
-                          >
-                            <Send className="w-5 h-5 text-white" />
-                          </button>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          </ResizablePanel>
-
-          {/* Resizable Handle */}
-          {isMapExpanded && (
-            <ResizableHandle withHandle className="bg-gray-700 hover:bg-gray-600" />
-          )}
-
-          {/* Map Panel */}
-          {isMapExpanded && (
-            <ResizablePanel defaultSize={25} minSize={20} maxSize={50}>
-              <MapPanel 
-                isExpanded={isMapExpanded} 
-                onToggle={() => setIsMapExpanded(!isMapExpanded)} 
-              />
-            </ResizablePanel>
-          )}
-
-          {/* Map Toggle Button (when collapsed) */}
-          {!isMapExpanded && (
-            <div className="absolute top-20 right-4 z-10">
-              <Button
-                onClick={() => setIsMapExpanded(true)}
-                size="icon"
-                variant="ghost"
-                className="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-600"
-                title="Open Map"
-              >
-                <Map className="w-4 h-4" />
-              </Button>
+          </div>
+        ) : (
+          <div className="flex-1 mb-4 overflow-y-auto scrollbar-hide">
+            <div className="max-w-4xl mx-auto p-4">
+              {chatMessages.map(renderChatMessage)}
             </div>
-          )}
-        </ResizablePanelGroup>
+          </div>
+        )}
+
+        {/* Input Container with Text Canvas */}
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="relative bg-[#303030] rounded-2xl shadow-lg overflow-hidden transition-colors duration-300">
+            {/* Text Canvas - Appears above the input area */}
+            <TextCanvas 
+              isOpen={isTextCanvasOpen} 
+              onClose={() => setIsTextCanvasOpen(false)}
+              onProcessText={handleProcessText}
+              content={canvasContent}
+              setContent={setCanvasContent}
+            >
+              {/* Bottom Button Container - moved inside TextCanvas */}
+              <div className="flex items-center justify-between">
+                {/* Left aligned buttons */}
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handleTextToEarth}
+                    className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors duration-200 group"
+                    title="Text to Earth"
+                  >
+                    <Earth className="w-5 h-5 text-white" />
+                  </button>
+                  
+                  <button
+                    onClick={() => console.log('Take screenshot')}
+                    className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                    title="Take screenshot"
+                  >
+                    <Camera className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                  </button>
+                  
+                  {/* MCP Server dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
+                        title="MCP Server"
+                      >
+                        <Server className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                        {(selectedServers.length > 0 || selectedFeatures.length > 0) && (
+                          <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                            {selectedServers.length + selectedFeatures.length}
+                          </span>
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto bg-gray-800 border-gray-700">
+                      <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
+                        MCP Servers
+                      </div>
+                      <DropdownMenuSeparator />
+                      {mcpServers.map((server) => (
+                        <div key={server.id}>
+                          <Collapsible 
+                            open={expandedServers.includes(server.id)}
+                            onOpenChange={() => toggleServerExpansion(server.id)}
+                          >
+                            <div className="flex items-center">
+                              <DropdownMenuCheckboxItem
+                                checked={selectedServers.includes(server.id)}
+                                onCheckedChange={() => toggleServerSelection(server.id)}
+                                className="flex items-center justify-between flex-1 pr-2 text-white"
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-2 h-2 rounded-full ${
+                                    server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                                  }`} />
+                                  <span>{server.name}</span>
+                                </div>
+                              </DropdownMenuCheckboxItem>
+                              <CollapsibleTrigger asChild>
+                                <button 
+                                  className="p-1 hover:bg-gray-700 rounded"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleServerExpansion(server.id);
+                                  }}
+                                >
+                                  {expandedServers.includes(server.id) ? (
+                                    <ChevronDown className="w-4 h-4 text-white" />
+                                  ) : (
+                                    <ChevronRight className="w-4 h-4 text-white" />
+                                  )}
+                                </button>
+                              </CollapsibleTrigger>
+                            </div>
+                            <CollapsibleContent className="pl-6">
+                              {server.features.map((feature) => (
+                                <DropdownMenuCheckboxItem
+                                  key={feature.id}
+                                  checked={selectedFeatures.includes(feature.id)}
+                                  onCheckedChange={() => toggleFeatureSelection(feature.id)}
+                                  className="text-sm text-white"
+                                  onSelect={(e) => e.preventDefault()}
+                                >
+                                  {feature.name}
+                                </DropdownMenuCheckboxItem>
+                              ))}
+                            </CollapsibleContent>
+                          </Collapsible>
+                        </div>
+                      ))}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2 text-white">
+                        <Plus className="w-4 h-4" />
+                        Add New Server
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Model Provider dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
+                        title="Model Provider"
+                      >
+                        <Bot className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                        {selectedModel && (
+                          <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                            1
+                          </span>
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-64 bg-gray-800 border-gray-700">
+                      <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
+                        AI Models
+                      </div>
+                      <DropdownMenuSeparator />
+                      <RadioGroup value={selectedModel} onValueChange={handleModelSelection} className="p-2">
+                        {availableModels.map((model) => {
+                          const IconComponent = model.icon;
+                          return (
+                            <div key={model.id} className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded">
+                              <RadioGroupItem value={model.id} id={model.id} />
+                              <label htmlFor={model.id} className="flex items-center gap-2 cursor-pointer flex-1">
+                                <IconComponent className={`w-4 h-4 ${model.color}`} />
+                                <span className="text-white">{model.name}</span>
+                              </label>
+                            </div>
+                          );
+                        })}
+                      </RadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Send button */}
+                <button
+                  onClick={handleSend}
+                  disabled={!canvasContent.trim()}
+                  className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
+                  title="Send message"
+                >
+                  <Send className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            </TextCanvas>
+
+            {/* Main Input Area - Hidden when canvas is open */}
+            {!isTextCanvasOpen && (
+              <>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message here..."
+                  className="w-full p-6 pb-20 resize-none border-none outline-none text-white placeholder-gray-400 text-lg bg-transparent h-[100px] overflow-hidden"
+                  rows={3}
+                />
+
+                {/* Bottom Button Container for regular input */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 transition-colors duration-300">
+                  <div className="flex items-center justify-between">
+                    {/* Left aligned buttons */}
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={handleTextToEarth}
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                        title="Text to Earth"
+                      >
+                        <Earth className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                      </button>
+                      
+                      <button
+                        onClick={() => console.log('Take screenshot')}
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                        title="Take screenshot"
+                      >
+                        <Camera className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                      </button>
+                      
+                      {/* MCP Server dropdown */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
+                            title="MCP Server"
+                          >
+                            <Server className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                            {(selectedServers.length > 0 || selectedFeatures.length > 0) && (
+                              <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                {selectedServers.length + selectedFeatures.length}
+                              </span>
+                            )}
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-72 max-h-96 overflow-y-auto bg-gray-800 border-gray-700">
+                          <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
+                            MCP Servers
+                          </div>
+                          <DropdownMenuSeparator />
+                          {mcpServers.map((server) => (
+                            <div key={server.id}>
+                              <Collapsible 
+                                open={expandedServers.includes(server.id)}
+                                onOpenChange={() => toggleServerExpansion(server.id)}
+                              >
+                                <div className="flex items-center">
+                                  <DropdownMenuCheckboxItem
+                                    checked={selectedServers.includes(server.id)}
+                                    onCheckedChange={() => toggleServerSelection(server.id)}
+                                    className="flex items-center justify-between flex-1 pr-2 text-white"
+                                    onSelect={(e) => e.preventDefault()}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <div className={`w-2 h-2 rounded-full ${
+                                        server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                                      }`} />
+                                      <span>{server.name}</span>
+                                    </div>
+                                  </DropdownMenuCheckboxItem>
+                                  <CollapsibleTrigger asChild>
+                                    <button 
+                                      className="p-1 hover:bg-gray-700 rounded"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleServerExpansion(server.id);
+                                      }}
+                                    >
+                                      {expandedServers.includes(server.id) ? (
+                                        <ChevronDown className="w-4 h-4 text-white" />
+                                      ) : (
+                                        <ChevronRight className="w-4 h-4 text-white" />
+                                      )}
+                                    </button>
+                                  </CollapsibleTrigger>
+                                </div>
+                                <CollapsibleContent className="pl-6">
+                                  {server.features.map((feature) => (
+                                    <DropdownMenuCheckboxItem
+                                      key={feature.id}
+                                      checked={selectedFeatures.includes(feature.id)}
+                                      onCheckedChange={() => toggleFeatureSelection(feature.id)}
+                                      className="text-sm text-white"
+                                      onSelect={(e) => e.preventDefault()}
+                                    >
+                                      {feature.name}
+                                    </DropdownMenuCheckboxItem>
+                                  ))}
+                                </CollapsibleContent>
+                              </Collapsible>
+                            </div>
+                          ))}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={handleAddNewServer} className="flex items-center gap-2 text-white">
+                            <Plus className="w-4 h-4" />
+                            Add New Server
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      {/* Model Provider dropdown */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group relative"
+                            title="Model Provider"
+                          >
+                            <Bot className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                            {selectedModel && (
+                              <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                1
+                              </span>
+                            )}
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-64 bg-gray-800 border-gray-700">
+                          <div className="px-2 py-1.5 text-sm font-semibold text-gray-300">
+                            AI Models
+                          </div>
+                          <DropdownMenuSeparator />
+                          <RadioGroup value={selectedModel} onValueChange={handleModelSelection} className="p-2">
+                            {availableModels.map((model) => {
+                              const IconComponent = model.icon;
+                              return (
+                                <div key={model.id} className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded">
+                                  <RadioGroupItem value={model.id} id={model.id} />
+                                  <label htmlFor={model.id} className="flex items-center gap-2 cursor-pointer flex-1">
+                                    <IconComponent className={`w-4 h-4 ${model.color}`} />
+                                    <span className="text-white">{model.name}</span>
+                                  </label>
+                                </div>
+                              );
+                            })}
+                          </RadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    {/* Send button */}
+                    <button
+                      onClick={handleSend}
+                      disabled={!message.trim()}
+                      className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200 group"
+                      title="Send message"
+                    >
+                      <Send className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -791,5 +752,3 @@ const Index = () => {
 };
 
 export default Index;
-
-}
