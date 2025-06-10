@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth } from 'lucide-react';
+import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth, Map } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -14,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Moon, Sun } from 'lucide-react';
 import { TextCanvas } from '../components/TextCanvas';
 import { ProcessedTextResult } from '../components/ProcessedTextResult';
+import { MapPanel } from '../components/MapPanel';
 
 interface ChatMessage {
   id: string;
@@ -67,6 +67,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const [expandedServers, setExpandedServers] = useState<string[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isTextCanvasOpen, setIsTextCanvasOpen] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -220,6 +221,10 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     setIsTextCanvasOpen(true);
   };
 
+  const handleMapToggle = () => {
+    setIsMapOpen(!isMapOpen);
+  };
+
   const renderChatMessage = (msg: ChatMessage) => {
     if (msg.type === 'processed-result') {
       return (
@@ -255,16 +260,27 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       {/* Top bar with sidebar trigger and new chat button */}
       <div className="mb-4 flex justify-between items-center">
         <SidebarTrigger />
-        {(!sidebarOpen || isMobile) && (
+        <div className="flex items-center gap-2">
           <Button
-            onClick={handleNewChat}
+            onClick={handleMapToggle}
             size="icon"
             variant="ghost"
             className="text-gray-300 hover:bg-gray-700 hover:text-white"
+            title="Toggle Map"
           >
-            <Plus className="w-4 h-4" />
+            <Map className="w-4 h-4" />
           </Button>
-        )}
+          {(!sidebarOpen || isMobile) && (
+            <Button
+              onClick={handleNewChat}
+              size="icon"
+              variant="ghost"
+              className="text-gray-300 hover:bg-gray-700 hover:text-white"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Settings Dialog */}
@@ -353,7 +369,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       </Dialog>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${isMapOpen ? 'mr-96' : ''}`}>
         {chatMessages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="w-full max-w-4xl">
@@ -723,6 +739,9 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
           </div>
         </div>
       </div>
+
+      {/* Map Panel */}
+      <MapPanel isOpen={isMapOpen} onToggle={handleMapToggle} />
     </div>
   );
 };
