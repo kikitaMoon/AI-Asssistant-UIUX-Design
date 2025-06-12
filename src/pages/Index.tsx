@@ -14,13 +14,20 @@ import { Moon, Sun } from 'lucide-react';
 import { TextCanvas } from '../components/TextCanvas';
 import { ProcessedTextResult } from '../components/ProcessedTextResult';
 import { MapPanel } from '../components/MapPanel';
+import { InfoCard } from '../components/InfoCard';
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  type?: 'text' | 'processed-result';
+  type?: 'text' | 'processed-result' | 'info-card';
+  cardData?: {
+    title: string;
+    imageUrl: string;
+    description: string;
+    source?: string;
+  };
 }
 
 interface IndexContentProps {
@@ -84,7 +91,14 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     {
       text: "How can I optimize my React application performance?",
       icon: Code,
-      sampleResponse: "Here are key strategies to optimize React performance:\n\n1. **Use React.memo()** for functional components\n2. **Implement useMemo()** for expensive calculations\n3. **Use useCallback()** for function props\n4. **Code splitting** with React.lazy()\n5. **Optimize bundle size** with tree shaking"
+      sampleResponse: "Here are key strategies to optimize React performance:\n\n1. **Use React.memo()** for functional components\n2. **Implement useMemo()** for expensive calculations\n3. **Use useCallback()** for function props\n4. **Code splitting** with React.lazy()\n5. **Optimize bundle size** with tree shaking",
+      showCard: true,
+      cardData: {
+        title: "React Performance Optimization",
+        imageUrl: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&h=200&fit=crop",
+        description: "React performance optimization involves various techniques including memoization, code splitting, and bundle optimization. These strategies help reduce re-renders and improve loading times for better user experience.",
+        source: "React Documentation & Best Practices"
+      }
     },
     {
       text: "What are the best practices for TypeScript development?",
@@ -147,7 +161,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     }
   };
 
-  const handleSampleQuestion = (question: { text: string; sampleResponse: string }) => {
+  const handleSampleQuestion = (question: { text: string; sampleResponse: string; showCard?: boolean; cardData?: any }) => {
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -161,7 +175,8 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       role: 'assistant',
       content: question.sampleResponse,
       timestamp: new Date(),
-      type: 'text'
+      type: question.showCard ? 'info-card' : 'text',
+      cardData: question.cardData
     };
 
     setChatMessages([userMessage, assistantMessage]);
@@ -234,6 +249,27 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
           timestamp={msg.timestamp}
           onEdit={() => handleEditProcessedResult(msg.content)}
         />
+      );
+    }
+
+    if (msg.type === 'info-card' && msg.cardData) {
+      return (
+        <div key={msg.id} className="mb-6">
+          <InfoCard
+            title={msg.cardData.title}
+            imageUrl={msg.cardData.imageUrl}
+            description={msg.cardData.description}
+            source={msg.cardData.source}
+            onSubscribe={() => console.log('Subscribe clicked')}
+            onAuthoritative={() => console.log('Authoritative clicked')}
+          />
+          <div className="mt-4 bg-gray-700 text-gray-100 p-3 rounded-lg max-w-2xl mx-auto">
+            <div className="whitespace-pre-wrap">{msg.content}</div>
+            <div className="text-xs mt-1 text-gray-400">
+              {msg.timestamp.toLocaleTimeString()}
+            </div>
+          </div>
+        </div>
       );
     }
 
