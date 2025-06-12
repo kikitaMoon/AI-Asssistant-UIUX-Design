@@ -25,11 +25,11 @@ export const InfoCard: React.FC<InfoCardProps> = ({
       <CardContent className="p-0">
         <div className="flex">
           {/* Left side - Image */}
-          <div className="w-48 h-32 flex-shrink-0 flex items-center justify-center bg-gray-900 rounded-l-lg">
+          <div className="w-48 h-32 flex-shrink-0">
             <img
               src={imageUrl}
               alt={title}
-              className="max-w-full max-h-full object-contain"
+              className="w-full h-full object-cover rounded-l-lg"
             />
           </div>
           
@@ -57,8 +57,16 @@ export const InfoCard: React.FC<InfoCardProps> = ({
                   onClick={onSubscribe}
                   className="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 transition-colors"
                 >
-                  <span className="text-xs">+</span>
-                  <span>Add Data</span>
+                  <span className="text-xs">♡</span>
+                  <span>Subscribe</span>
+                </button>
+                
+                <button
+                  onClick={onAuthoritative}
+                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 transition-colors"
+                >
+                  <span className="text-xs">✓</span>
+                  <span>Authoritative</span>
                 </button>
               </div>
               
