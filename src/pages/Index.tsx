@@ -27,6 +27,10 @@ interface ChatMessage {
     imageUrl: string;
     description: string;
     source?: string;
+    sourceUrl?: string;
+    dataType?: string;
+    author?: string;
+    authorUrl?: string;
   };
 }
 
@@ -89,15 +93,19 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
 
   const sampleQuestions = [
     {
-      text: "How can I optimize my React application performance?",
+      text: "Can you search the top 3 World Imagery data ?",
       icon: Code,
-      sampleResponse: "Here are key strategies to optimize React performance:\n\n1. **Use React.memo()** for functional components\n2. **Implement useMemo()** for expensive calculations\n3. **Use useCallback()** for function props\n4. **Code splitting** with React.lazy()\n5. **Optimize bundle size** with tree shaking",
+      sampleResponse: "Here are the top 3 World Imagery datasets:\n\n1. **ESRI World Imagery** - High-resolution satellite imagery\n2. **Google Satellite** - Global satellite and aerial imagery\n3. **Bing Maps Aerial** - Microsoft's aerial imagery service\n\nThese datasets provide comprehensive global coverage with regular updates and high-quality imagery suitable for various applications including GIS analysis, mapping, and visualization.",
       showCard: true,
       cardData: {
-        title: "React Performance Optimization",
-        imageUrl: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&h=200&fit=crop",
-        description: "React performance optimization involves various techniques including memoization, code splitting, and bundle optimization. These strategies help reduce re-renders and improve loading times for better user experience.",
-        source: "React Documentation & Best Practices"
+        title: "World Imagery - High Resolution Satellite Data",
+        imageUrl: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=200&fit=crop",
+        description: "Comprehensive global satellite imagery dataset providing high-resolution coverage for mapping, GIS analysis, and visualization applications. Updated regularly with the latest satellite captures.",
+        source: "ESRI World Imagery Service",
+        sourceUrl: "https://www.esri.com/en-us/arcgis/products/arcgis-online/services/world-imagery",
+        dataType: "Image Layer",
+        author: "Testing Org",
+        authorUrl: "https://example.com/testing-org"
       }
     },
     {

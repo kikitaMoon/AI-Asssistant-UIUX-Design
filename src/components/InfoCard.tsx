@@ -1,15 +1,18 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, MoreHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface InfoCardProps {
   title: string;
   imageUrl: string;
   description: string;
   source?: string;
-  onSubscribe?: () => void;
-  onAuthoritative?: () => void;
+  sourceUrl?: string;
+  dataType?: string;
+  author?: string;
+  authorUrl?: string;
+  onAddData?: () => void;
 }
 
 export const InfoCard: React.FC<InfoCardProps> = ({
@@ -17,33 +20,63 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   imageUrl,
   description,
   source,
-  onSubscribe,
-  onAuthoritative
+  sourceUrl,
+  dataType = "Image Layer",
+  author,
+  authorUrl,
+  onAddData
 }) => {
   return (
     <Card className="bg-gray-800 border-gray-700 text-white max-w-2xl mx-auto">
       <CardContent className="p-0">
         <div className="flex">
           {/* Left side - Image */}
-          <div className="w-48 h-32 flex-shrink-0">
+          <div className="w-48 h-32 flex-shrink-0 flex items-center justify-center bg-gray-900 rounded-l-lg">
             <img
               src={imageUrl}
               alt={title}
-              className="w-full h-full object-cover rounded-l-lg"
+              className="max-w-full max-h-full object-contain rounded"
             />
           </div>
           
           {/* Right side - Content */}
           <div className="flex-1 p-4 flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {sourceUrl ? (
+                  <a 
+                    href={sourceUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-blue-400 transition-colors underline"
+                  >
+                    {title}
+                  </a>
+                ) : (
+                  title
+                )}
+              </h3>
               
-              {source && (
+              {(dataType || author) && (
                 <div className="flex items-center gap-1 mb-2">
                   <div className="w-4 h-4 bg-yellow-500 rounded-sm flex items-center justify-center">
                     <span className="text-xs text-black font-bold">📷</span>
                   </div>
-                  <span className="text-sm text-blue-400">{source}</span>
+                  <span className="text-sm text-blue-400">
+                    {dataType} by{' '}
+                    {authorUrl ? (
+                      <a 
+                        href={authorUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="hover:text-blue-300 underline"
+                      >
+                        {author}
+                      </a>
+                    ) : (
+                      author
+                    )}
+                  </span>
                 </div>
               )}
               
@@ -51,33 +84,15 @@ export const InfoCard: React.FC<InfoCardProps> = ({
             </div>
             
             {/* Bottom actions */}
-            <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-600">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={onSubscribe}
-                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 transition-colors"
-                >
-                  <span className="text-xs">♡</span>
-                  <span>Subscribe</span>
-                </button>
-                
-                <button
-                  onClick={onAuthoritative}
-                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 transition-colors"
-                >
-                  <span className="text-xs">✓</span>
-                  <span>Authoritative</span>
-                </button>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <button className="text-gray-400 hover:text-yellow-400 transition-colors">
-                  <Star className="w-4 h-4" />
-                </button>
-                <button className="text-gray-400 hover:text-white transition-colors">
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
-              </div>
+            <div className="flex items-center justify-end mt-3 pt-2 border-t border-gray-600">
+              <Button
+                onClick={onAddData}
+                variant="outline"
+                size="sm"
+                className="bg-transparent border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white hover:border-gray-500"
+              >
+                Add Data
+              </Button>
             </div>
           </div>
         </div>
