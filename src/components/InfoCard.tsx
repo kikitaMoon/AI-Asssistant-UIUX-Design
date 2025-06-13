@@ -2,6 +2,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Heart, Check } from 'lucide-react';
 
 interface InfoCardProps {
   title: string;
@@ -13,6 +15,9 @@ interface InfoCardProps {
   author?: string;
   authorUrl?: string;
   onAddData?: () => void;
+  onSubscribe?: () => void;
+  onAuthoritative?: () => void;
+  showBadges?: boolean;
 }
 
 export const InfoCard: React.FC<InfoCardProps> = ({
@@ -24,7 +29,10 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   dataType = "Image Layer",
   author,
   authorUrl,
-  onAddData
+  onAddData,
+  onSubscribe,
+  onAuthoritative,
+  showBadges = false
 }) => {
   return (
     <Card className="bg-gray-800 border-gray-700 text-white max-w-2xl mx-auto">
@@ -77,6 +85,27 @@ export const InfoCard: React.FC<InfoCardProps> = ({
                       author
                     )}
                   </span>
+                </div>
+              )}
+              
+              {showBadges && (
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge 
+                    variant="outline" 
+                    className="cursor-pointer hover:bg-gray-700 border-gray-600 text-gray-300"
+                    onClick={onSubscribe}
+                  >
+                    <Heart className="w-3 h-3 mr-1" />
+                    Subscribe
+                  </Badge>
+                  <Badge 
+                    variant="outline" 
+                    className="cursor-pointer hover:bg-gray-700 border-gray-600 text-gray-300"
+                    onClick={onAuthoritative}
+                  >
+                    <Check className="w-3 h-3 mr-1" />
+                    Authoritative
+                  </Badge>
                 </div>
               )}
               

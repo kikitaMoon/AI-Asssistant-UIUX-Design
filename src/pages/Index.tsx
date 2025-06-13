@@ -97,16 +97,38 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       icon: Code,
       sampleResponse: "Here are the top 3 World Imagery datasets:\n\n1. **ESRI World Imagery** - High-resolution satellite imagery\n2. **Google Satellite** - Global satellite and aerial imagery\n3. **Bing Maps Aerial** - Microsoft's aerial imagery service\n\nThese datasets provide comprehensive global coverage with regular updates and high-quality imagery suitable for various applications including GIS analysis, mapping, and visualization.",
       showCard: true,
-      cardData: {
-        title: "World Imagery - High Resolution Satellite Data",
-        imageUrl: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=200&fit=crop",
-        description: "Comprehensive global satellite imagery dataset providing high-resolution coverage for mapping, GIS analysis, and visualization applications. Updated regularly with the latest satellite captures.",
-        source: "ESRI World Imagery Service",
-        sourceUrl: "https://www.esri.com/en-us/arcgis/products/arcgis-online/services/world-imagery",
-        dataType: "Image Layer",
-        author: "Testing Org",
-        authorUrl: "https://example.com/testing-org"
-      }
+      cardData: [
+        {
+          title: "World Imagery - High Resolution Satellite Data",
+          imageUrl: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=200&fit=crop",
+          description: "Comprehensive global satellite imagery dataset providing high-resolution coverage for mapping, GIS analysis, and visualization applications. Updated regularly with the latest satellite captures.",
+          source: "ESRI World Imagery Service",
+          sourceUrl: "https://www.esri.com/en-us/arcgis/products/arcgis-online/services/world-imagery",
+          dataType: "Image Layer",
+          author: "Esri",
+          authorUrl: "https://www.esri.com"
+        },
+        {
+          title: "Google Satellite Imagery",
+          imageUrl: "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=300&h=200&fit=crop",
+          description: "Google's comprehensive satellite and aerial imagery service providing global coverage with high-quality imagery for mapping and visualization applications.",
+          source: "Google Maps Platform",
+          sourceUrl: "https://developers.google.com/maps/documentation/maps-static/overview",
+          dataType: "Image Layer",
+          author: "Esri",
+          authorUrl: "https://www.esri.com"
+        },
+        {
+          title: "Bing Maps Aerial Imagery",
+          imageUrl: "https://images.unsplash.com/photo-1517976487492-5750f3195933?w=300&h=200&fit=crop",
+          description: "Microsoft's aerial imagery service offering detailed satellite and aerial photography for comprehensive geographic coverage and analysis.",
+          source: "Microsoft Bing Maps",
+          sourceUrl: "https://www.microsoft.com/en-us/maps/choose-your-bing-maps-api",
+          dataType: "Image Layer",
+          author: "Esri",
+          authorUrl: "https://www.esri.com"
+        }
+      ]
     },
     {
       text: "What are the best practices for TypeScript development?",
@@ -263,14 +285,43 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     if (msg.type === 'info-card' && msg.cardData) {
       return (
         <div key={msg.id} className="mb-6">
-          <InfoCard
-            title={msg.cardData.title}
-            imageUrl={msg.cardData.imageUrl}
-            description={msg.cardData.description}
-            source={msg.cardData.source}
-            onSubscribe={() => console.log('Subscribe clicked')}
-            onAuthoritative={() => console.log('Authoritative clicked')}
-          />
+          {/* Multiple cards in vertical layout */}
+          {Array.isArray(msg.cardData) ? (
+            <div className="space-y-4">
+              {msg.cardData.map((card, index) => (
+                <InfoCard
+                  key={index}
+                  title={card.title}
+                  imageUrl={card.imageUrl}
+                  description={card.description}
+                  source={card.source}
+                  sourceUrl={card.sourceUrl}
+                  dataType={card.dataType}
+                  author={card.author}
+                  authorUrl={card.authorUrl}
+                  showBadges={true}
+                  onAddData={() => console.log('Add Data clicked')}
+                  onSubscribe={() => console.log('Subscribe clicked')}
+                  onAuthoritative={() => console.log('Authoritative clicked')}
+                />
+              ))}
+            </div>
+          ) : (
+            <InfoCard
+              title={msg.cardData.title}
+              imageUrl={msg.cardData.imageUrl}
+              description={msg.cardData.description}
+              source={msg.cardData.source}
+              sourceUrl={msg.cardData.sourceUrl}
+              dataType={msg.cardData.dataType}
+              author={msg.cardData.author}
+              authorUrl={msg.cardData.authorUrl}
+              showBadges={true}
+              onAddData={() => console.log('Add Data clicked')}
+              onSubscribe={() => console.log('Subscribe clicked')}
+              onAuthoritative={() => console.log('Authoritative clicked')}
+            />
+          )}
           <div className="mt-4 bg-gray-700 text-gray-100 p-3 rounded-lg max-w-2xl mx-auto">
             <div className="whitespace-pre-wrap">{msg.content}</div>
             <div className="text-xs mt-1 text-gray-400">
