@@ -39,11 +39,11 @@ export const InfoCard: React.FC<InfoCardProps> = ({
       <CardContent className="p-0">
         <div className="flex">
           {/* Left side - Image */}
-          <div className="w-48 h-32 flex-shrink-0 flex items-center justify-center bg-gray-900 rounded-l-lg">
+          <div className="w-48 h-32 flex-shrink-0 bg-gray-900 rounded-l-lg overflow-hidden">
             <img
               src={imageUrl}
               alt={title}
-              className="max-w-full max-h-full object-contain rounded"
+              className="w-full h-full object-cover"
             />
           </div>
           
@@ -88,8 +88,13 @@ export const InfoCard: React.FC<InfoCardProps> = ({
                 </div>
               )}
               
+              <p className="text-sm text-gray-300 leading-relaxed">{description}</p>
+            </div>
+            
+            {/* Bottom actions */}
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-600">
               {showBadges && (
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2">
                   <Badge 
                     variant="outline" 
                     className="cursor-pointer hover:bg-gray-700 border-gray-600 text-gray-300"
@@ -109,11 +114,6 @@ export const InfoCard: React.FC<InfoCardProps> = ({
                 </div>
               )}
               
-              <p className="text-sm text-gray-300 leading-relaxed">{description}</p>
-            </div>
-            
-            {/* Bottom actions */}
-            <div className="flex items-center justify-end mt-3 pt-2 border-t border-gray-600">
               <Button
                 onClick={onAddData}
                 variant="outline"
