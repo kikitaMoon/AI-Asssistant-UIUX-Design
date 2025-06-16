@@ -49,21 +49,21 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
   if (!isOpen) return null;
 
   return (
-    <div className="bg-[#303030] rounded-t-2xl border-b border-gray-600 transition-all duration-300">
+    <div className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-all duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-600">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          <Type className="w-5 h-5 text-blue-400" />
-          <h3 className="text-white font-medium">Text to Earth Canvas</h3>
+          <Type className="w-5 h-5 text-blue-500" />
+          <h3 className="text-gray-900 dark:text-white font-medium">Text to Earth Canvas</h3>
           {fileName && (
-            <span className="text-sm text-gray-400">({fileName})</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">({fileName})</span>
           )}
         </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="text-gray-400 hover:text-white hover:bg-gray-600 h-8 w-8"
+          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 h-8 w-8"
         >
           <X className="w-4 h-4" />
         </Button>
@@ -83,7 +83,7 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
             variant="ghost"
             size="icon"
             onClick={() => fileInputRef.current?.click()}
-            className="text-gray-400 hover:text-white hover:bg-gray-600 h-8 w-8"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 h-8 w-8"
             title="Upload Text File"
           >
             <Upload className="w-4 h-4" />
@@ -92,7 +92,7 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
             variant="ghost"
             size="icon"
             onClick={handlePaste}
-            className="text-gray-400 hover:text-white hover:bg-gray-600 h-8 w-8"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 h-8 w-8"
             title="Paste from Clipboard"
           >
             <Clipboard className="w-4 h-4" />
@@ -101,7 +101,7 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
             variant="ghost"
             size="icon"
             onClick={handleClear}
-            className="text-gray-400 hover:text-red-400 hover:bg-gray-600 h-8 w-8"
+            className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 hover:bg-gray-200 dark:hover:bg-gray-700 h-8 w-8"
             title="Clear"
           >
             <Trash2 className="w-4 h-4" />
@@ -113,11 +113,11 @@ export const TextCanvas = ({ isOpen, onClose, onProcessText, processedResult, co
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Type, paste, or upload your text content here..."
-          className="min-h-[150px] bg-gray-800 border-gray-600 text-white placeholder-gray-400 resize-none"
+          className="min-h-[150px] bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none focus:border-blue-500 dark:focus:border-blue-400"
           rows={6}
         />
 
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-gray-500 dark:text-gray-400">
           Supported formats: .txt, .md, .csv, .json, .xml, .log
         </div>
       </div>
