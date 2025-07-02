@@ -43,28 +43,43 @@ const mcpServers = [
   {
     id: 'server1',
     name: 'Database Server',
+    description: 'Advanced database management and query execution server with support for multiple database engines.',
     status: 'connected' as const,
+    version: '2.1.0',
+    uptime: '99.9%',
+    commands: ['db:query', 'db:schema', 'db:migrate', 'db:backup'],
+    tools: ['PostgreSQL Connector', 'MySQL Adapter', 'Query Optimizer', 'Schema Analyzer'],
     features: [
-      { id: 'feature1', name: 'Query Database' },
-      { id: 'feature2', name: 'Schema Analysis' }
+      { id: 'feature1', name: 'Query Database', description: 'Execute SQL queries across multiple databases' },
+      { id: 'feature2', name: 'Schema Analysis', description: 'Analyze and optimize database schemas' }
     ]
   },
   {
     id: 'server2',
     name: 'File System',
+    description: 'Comprehensive file system operations with advanced file management capabilities and security features.',
     status: 'disconnected' as const,
+    version: '1.8.5',
+    uptime: '0%',
+    commands: ['fs:read', 'fs:write', 'fs:delete', 'fs:search', 'fs:compress'],
+    tools: ['File Explorer', 'Permission Manager', 'Backup System', 'Search Indexer'],
     features: [
-      { id: 'feature3', name: 'File Operations' },
-      { id: 'feature4', name: 'Directory Listing' }
+      { id: 'feature3', name: 'File Operations', description: 'Read, write, and manage files with advanced permissions' },
+      { id: 'feature4', name: 'Directory Listing', description: 'Browse and search directory structures efficiently' }
     ]
   },
   {
     id: 'server3',
     name: 'API Gateway',
+    description: 'High-performance API gateway with load balancing, rate limiting, and comprehensive monitoring.',
     status: 'connected' as const,
+    version: '3.2.1',
+    uptime: '99.7%',
+    commands: ['api:get', 'api:post', 'api:auth', 'api:monitor', 'api:cache'],
+    tools: ['Load Balancer', 'Rate Limiter', 'Auth Manager', 'Analytics Dashboard'],
     features: [
-      { id: 'feature5', name: 'REST API' },
-      { id: 'feature6', name: 'GraphQL' }
+      { id: 'feature5', name: 'REST API', description: 'Full REST API support with automatic documentation' },
+      { id: 'feature6', name: 'GraphQL', description: 'GraphQL endpoint with schema introspection' }
     ]
   }
 ];
@@ -390,53 +405,60 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
 
       {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-6xl w-[80vw] h-[80vh] max-h-[80vh] p-0">
-          <DialogHeader className="px-6 pt-3 pb-0">
-            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+        <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-7xl w-[90vw] h-[85vh] max-h-[85vh] p-0">
+          <DialogHeader className="px-6 pt-4 pb-2">
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Settings
             </DialogTitle>
           </DialogHeader>
-          <div className="flex h-full px-6 pb-6 pt-2">
+          <div className="flex h-full">
             <Tabs defaultValue="general" orientation="vertical" className="flex w-full h-full">
-              <TabsList className="flex flex-col h-full w-48 bg-gray-700 p-2 justify-start">
+              <TabsList className="flex flex-col h-full w-64 bg-gray-700 p-3 justify-start rounded-none">
                 <TabsTrigger 
                   value="general" 
-                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-2 py-3"
+                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-3 py-4 px-4 text-base"
                 >
                   Theme
                 </TabsTrigger>
                 <TabsTrigger 
                   value="mcp" 
-                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-2 py-3"
+                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 mb-3 py-4 px-4 text-base"
                 >
                   MCP Server
                 </TabsTrigger>
                 <TabsTrigger 
                   value="llm" 
-                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 py-3"
+                  className="w-full justify-start text-white data-[state=active]:bg-gray-600 py-4 px-4 text-base"
                 >
                   LLM Model Provider
                 </TabsTrigger>
               </TabsList>
-              <div className="flex-1 pl-6 overflow-auto">
-                <TabsContent value="general" className="space-y-4 mt-0 h-full">
-                  <div className="flex items-center justify-between">
-                    <span>Theme</span>
+              <div className="flex-1 p-6 overflow-auto bg-gray-750">
+                <TabsContent value="general" className="space-y-6 mt-0 h-full">
+                  <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                    <div>
+                      <h3 className="text-lg font-semibold">Theme</h3>
+                      <p className="text-gray-400 text-sm">Switch between light and dark mode</p>
+                    </div>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={toggleTheme}
-                      className="text-white hover:bg-gray-700"
+                      className="text-white hover:bg-gray-600"
                     >
                       {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                     </Button>
                   </div>
                 </TabsContent>
-                <TabsContent value="mcp" className="space-y-4 mt-0 h-full">
-                  <div className="space-y-4">
+                
+                <TabsContent value="mcp" className="space-y-6 mt-0 h-full">
+                  <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">MCP Servers</h3>
-                      <div className="flex gap-2">
+                      <div>
+                        <h3 className="text-xl font-semibold">MCP Servers</h3>
+                        <p className="text-gray-400 mt-1">Manage your Model Context Protocol servers</p>
+                      </div>
+                      <div className="flex gap-3">
                         <Button
                           onClick={handleRefreshServers}
                           size="sm"
@@ -456,43 +478,112 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                         </Button>
                       </div>
                     </div>
-                    <div className="space-y-2">
+                    
+                    <div className="grid gap-6">
                       {mcpServers.map((server) => (
-                        <div key={server.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-3 h-3 rounded-full ${
-                              server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
-                            }`} />
-                            <div>
-                              <div className="font-medium">{server.name}</div>
-                              <div className="text-sm text-gray-400 capitalize">{server.status}</div>
+                        <div key={server.id} className="bg-gray-700 rounded-lg p-6 space-y-4">
+                          {/* Server Header */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-4 h-4 rounded-full ${
+                                server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                              }`} />
+                              <div>
+                                <h4 className="text-lg font-semibold text-white">{server.name}</h4>
+                                <p className="text-gray-300 text-sm capitalize">{server.status} • v{server.version}</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => handleConfigureServer(server.id)}
+                                size="sm"
+                                variant="ghost"
+                                className="text-gray-300 hover:text-white hover:bg-gray-600"
+                              >
+                                <Settings className="w-4 h-4 mr-2" />
+                                Config
+                              </Button>
                             </div>
                           </div>
-                          <Button
-                            onClick={() => handleConfigureServer(server.id)}
-                            size="sm"
-                            variant="ghost"
-                            className="text-gray-300 hover:text-white hover:bg-gray-600"
-                          >
-                            <Settings className="w-4 h-4 mr-2" />
-                            Config
-                          </Button>
+
+                          {/* Server Description */}
+                          <p className="text-gray-300 text-sm leading-relaxed">
+                            {server.description}
+                          </p>
+
+                          {/* Server Stats */}
+                          <div className="flex gap-6 text-sm">
+                            <div className="flex flex-col">
+                              <span className="text-gray-400">Uptime</span>
+                              <span className="text-white font-medium">{server.uptime}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-gray-400">Commands</span>
+                              <span className="text-white font-medium">{server.commands.length}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-gray-400">Tools</span>
+                              <span className="text-white font-medium">{server.tools.length}</span>
+                            </div>
+                          </div>
+
+                          {/* Commands Section */}
+                          <div>
+                            <h5 className="text-sm font-semibold text-gray-300 mb-2">Available Commands</h5>
+                            <div className="flex flex-wrap gap-2">
+                              {server.commands.map((command, index) => (
+                                <span key={index} className="px-2 py-1 bg-gray-600 text-gray-200 text-xs rounded font-mono">
+                                  {command}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Tools Section */}
+                          <div>
+                            <h5 className="text-sm font-semibold text-gray-300 mb-2">Integrated Tools</h5>
+                            <div className="grid grid-cols-2 gap-2">
+                              {server.tools.map((tool, index) => (
+                                <div key={index} className="flex items-center gap-2 p-2 bg-gray-600 rounded text-sm">
+                                  <Wrench className="w-3 h-3 text-blue-400" />
+                                  <span className="text-gray-200">{tool}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Features Section */}
+                          <div>
+                            <h5 className="text-sm font-semibold text-gray-300 mb-2">Features</h5>
+                            <div className="space-y-2">
+                              {server.features.map((feature) => (
+                                <div key={feature.id} className="p-3 bg-gray-600 rounded">
+                                  <div className="font-medium text-white text-sm">{feature.name}</div>
+                                  <div className="text-gray-300 text-xs mt-1">{feature.description}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="llm" className="space-y-4 mt-0 h-full">
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Available Models</h3>
-                    <RadioGroup value={selectedModel} onValueChange={handleModelSelection}>
+                
+                <TabsContent value="llm" className="space-y-6 mt-0 h-full">
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-xl font-semibold">LLM Model Provider</h3>
+                      <p className="text-gray-400 mt-1">Select your preferred language model</p>
+                    </div>
+                    <RadioGroup value={selectedModel} onValueChange={handleModelSelection} className="space-y-3">
                       {availableModels.map((model) => {
                         const IconComponent = model.icon;
                         return (
-                          <div key={model.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
-                            <div className="flex items-center gap-2">
-                              <IconComponent className={`w-4 h-4 ${model.color}`} />
-                              <span>{model.name}</span>
+                          <div key={model.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <IconComponent className={`w-5 h-5 ${model.color}`} />
+                              <span className="text-white font-medium">{model.name}</span>
                             </div>
                             <RadioGroupItem value={model.id} />
                           </div>
