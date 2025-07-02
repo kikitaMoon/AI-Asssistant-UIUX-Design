@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { MessageSquare, Plus, Settings, History } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageSquare, Plus, Settings, History, Edit2, Trash2, MoreHorizontal } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +13,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 // Mock historical topics data
 const historicalTopics = [
@@ -29,9 +35,21 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ onNewChat, onSettingsClick }: AppSidebarProps) {
+  const [hoveredTopic, setHoveredTopic] = useState<string | null>(null);
+
   const handleTopicClick = (topicId: string) => {
     console.log('Loading topic:', topicId);
     // This would typically load the selected conversation
+  };
+
+  const handleRename = (topicId: string) => {
+    console.log('Renaming topic:', topicId);
+    // This would open a rename dialog
+  };
+
+  const handleDelete = (topicId: string) => {
+    console.log('Deleting topic:', topicId);
+    // This would delete the conversation
   };
 
   return (
@@ -60,18 +78,42 @@ export function AppSidebar({ onNewChat, onSettingsClick }: AppSidebarProps) {
             <SidebarMenu className="overflow-y-auto scrollbar-hide max-h-[calc(100vh-200px)]">
               {historicalTopics.map((topic) => (
                 <SidebarMenuItem key={topic.id}>
-                  <SidebarMenuButton 
-                    onClick={() => handleTopicClick(topic.id)}
-                    className="flex flex-col items-start gap-1 h-auto py-2"
+                  <div 
+                    className="group relative flex items-center w-full"
+                    onMouseEnter={() => setHoveredTopic(topic.id)}
+                    onMouseLeave={() => setHoveredTopic(null)}
                   >
-                    <div className="flex items-center gap-2 w-full">
+                    <SidebarMenuButton 
+                      onClick={() => handleTopicClick(topic.id)}
+                      className="flex-1 justify-start text-left h-auto py-2 pr-8"
+                    >
                       <MessageSquare className="w-3 h-3 flex-shrink-0" />
                       <span className="text-sm truncate">{topic.title}</span>
-                    </div>
-                    <span className="text-xs text-sidebar-foreground/60 ml-5">
-                      {topic.date}
-                    </span>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                    
+                    {hoveredTopic === topic.id && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="absolute right-1 p-1 rounded hover:bg-sidebar-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreHorizontal className="w-3 h-3" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-32">
+                          <DropdownMenuItem onClick={() => handleRename(topic.id)} className="text-sm">
+                            <Edit2 className="w-3 h-3 mr-2" />
+                            Rename
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDelete(topic.id)} 
+                            className="text-sm text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-3 h-3 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

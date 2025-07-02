@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth, Map } from 'lucide-react';
+import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth, Map, RefreshCw } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -270,6 +270,16 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     setIsMapOpen(!isMapOpen);
   };
 
+  const handleRefreshServers = () => {
+    console.log('Refreshing MCP servers');
+    // This would refresh the server list
+  };
+
+  const handleConfigureServer = (serverId: string) => {
+    console.log('Configuring server:', serverId);
+    // This would open server configuration
+  };
+
   const renderChatMessage = (msg: ChatMessage) => {
     if (msg.type === 'processed-result') {
       return (
@@ -423,19 +433,53 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                   </div>
                 </TabsContent>
                 <TabsContent value="mcp" className="space-y-4 mt-0 h-full">
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">MCP Servers</h3>
-                    {mcpServers.map((server) => (
-                      <div key={server.id} className="flex items-center justify-between p-2 bg-gray-700 rounded">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${
-                            server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
-                          }`} />
-                          <span>{server.name}</span>
-                        </div>
-                        <span className="text-sm text-gray-400">{server.status}</span>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">MCP Servers</h3>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleRefreshServers}
+                          size="sm"
+                          variant="outline"
+                          className="text-white border-gray-600 hover:bg-gray-700"
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Refresh
+                        </Button>
+                        <Button
+                          onClick={handleAddNewServer}
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Server
+                        </Button>
                       </div>
-                    ))}
+                    </div>
+                    <div className="space-y-2">
+                      {mcpServers.map((server) => (
+                        <div key={server.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-3 h-3 rounded-full ${
+                              server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                            }`} />
+                            <div>
+                              <div className="font-medium">{server.name}</div>
+                              <div className="text-sm text-gray-400 capitalize">{server.status}</div>
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => handleConfigureServer(server.id)}
+                            size="sm"
+                            variant="ghost"
+                            className="text-gray-300 hover:text-white hover:bg-gray-600"
+                          >
+                            <Settings className="w-4 h-4 mr-2" />
+                            Config
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </TabsContent>
                 <TabsContent value="llm" className="space-y-4 mt-0 h-full">
