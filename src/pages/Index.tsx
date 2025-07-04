@@ -407,7 +407,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
         <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-7xl w-[90vw] h-[85vh] max-h-[85vh] p-0">
           <DialogHeader className="px-6 pt-4 pb-2">
-            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-green-400 via-purple-500 to-purple-600 bg-clip-text text-transparent">
               Settings
             </DialogTitle>
           </DialogHeader>
@@ -479,9 +479,9 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                       </div>
                     </div>
                     
-                    <div className="grid gap-4">
+                    <div className="grid gap-6">
                       {mcpServers.map((server) => (
-                        <div key={server.id} className="bg-gray-700 rounded-lg p-4 space-y-3">
+                        <div key={server.id} className="bg-gray-700 rounded-lg p-6 space-y-4">
                           {/* Server Header */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -509,40 +509,33 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                             {server.description}
                           </p>
 
-                          {/* Commands and Tools in a grid */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Commands and Tools in vertical layout */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Commands Section */}
                             <div>
-                              <h5 className="text-sm font-semibold text-gray-300 mb-2">Commands ({server.commands.length})</h5>
-                              <div className="flex flex-wrap gap-1">
-                                {server.commands.slice(0, 3).map((command, index) => (
-                                  <span key={index} className="px-2 py-1 bg-gray-600 text-gray-200 text-xs rounded font-mono">
-                                    {command}
-                                  </span>
+                              <h5 className="text-sm font-semibold text-gray-300 mb-3">Commands ({server.commands.length})</h5>
+                              <div className="space-y-2">
+                                {server.commands.map((command, index) => (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <Code className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                                    <span className="px-2 py-1 bg-gray-600 text-gray-200 text-xs rounded font-mono">
+                                      {command}
+                                    </span>
+                                  </div>
                                 ))}
-                                {server.commands.length > 3 && (
-                                  <span className="px-2 py-1 bg-gray-600 text-gray-400 text-xs rounded">
-                                    +{server.commands.length - 3} more
-                                  </span>
-                                )}
                               </div>
                             </div>
 
                             {/* Tools Section */}
                             <div>
-                              <h5 className="text-sm font-semibold text-gray-300 mb-2">Tools ({server.tools.length})</h5>
-                              <div className="space-y-1">
-                                {server.tools.slice(0, 2).map((tool, index) => (
-                                  <div key={index} className="flex items-center gap-2 text-sm">
-                                    <Wrench className="w-3 h-3 text-blue-400" />
-                                    <span className="text-gray-200">{tool}</span>
+                              <h5 className="text-sm font-semibold text-gray-300 mb-3">Tools ({server.tools.length})</h5>
+                              <div className="space-y-2">
+                                {server.tools.map((tool, index) => (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <Wrench className="w-3 h-3 text-green-400 flex-shrink-0" />
+                                    <span className="text-gray-200 text-sm">{tool}</span>
                                   </div>
                                 ))}
-                                {server.tools.length > 2 && (
-                                  <div className="text-gray-400 text-xs">
-                                    +{server.tools.length - 2} more tools
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </div>
@@ -587,7 +580,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
             <div className="w-full max-w-4xl">
               {/* Welcome Message */}
               <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 via-purple-500 to-purple-600 bg-clip-text text-transparent mb-2">
                   Hello, Sharon
                 </h1>
                 <p className="text-gray-400 text-lg">
