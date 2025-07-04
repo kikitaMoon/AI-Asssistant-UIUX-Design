@@ -479,31 +479,29 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                       </div>
                     </div>
                     
-                    <div className="grid gap-6">
+                    <div className="grid gap-4">
                       {mcpServers.map((server) => (
-                        <div key={server.id} className="bg-gray-700 rounded-lg p-6 space-y-4">
+                        <div key={server.id} className="bg-gray-700 rounded-lg p-4 space-y-3">
                           {/* Server Header */}
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className={`w-4 h-4 rounded-full ${
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-3 h-3 rounded-full ${
                                 server.status === 'connected' ? 'bg-green-500' : 'bg-red-500'
                               }`} />
                               <div>
                                 <h4 className="text-lg font-semibold text-white">{server.name}</h4>
-                                <p className="text-gray-300 text-sm capitalize">{server.status} • v{server.version}</p>
+                                <p className="text-gray-300 text-sm capitalize">{server.status}</p>
                               </div>
                             </div>
-                            <div className="flex gap-2">
-                              <Button
-                                onClick={() => handleConfigureServer(server.id)}
-                                size="sm"
-                                variant="ghost"
-                                className="text-gray-300 hover:text-white hover:bg-gray-600"
-                              >
-                                <Settings className="w-4 h-4 mr-2" />
-                                Config
-                              </Button>
-                            </div>
+                            <Button
+                              onClick={() => handleConfigureServer(server.id)}
+                              size="sm"
+                              variant="ghost"
+                              className="text-gray-300 hover:text-white hover:bg-gray-600"
+                            >
+                              <Settings className="w-4 h-4 mr-2" />
+                              Config
+                            </Button>
                           </div>
 
                           {/* Server Description */}
@@ -511,57 +509,41 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                             {server.description}
                           </p>
 
-                          {/* Server Stats */}
-                          <div className="flex gap-6 text-sm">
-                            <div className="flex flex-col">
-                              <span className="text-gray-400">Uptime</span>
-                              <span className="text-white font-medium">{server.uptime}</span>
+                          {/* Commands and Tools in a grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Commands Section */}
+                            <div>
+                              <h5 className="text-sm font-semibold text-gray-300 mb-2">Commands ({server.commands.length})</h5>
+                              <div className="flex flex-wrap gap-1">
+                                {server.commands.slice(0, 3).map((command, index) => (
+                                  <span key={index} className="px-2 py-1 bg-gray-600 text-gray-200 text-xs rounded font-mono">
+                                    {command}
+                                  </span>
+                                ))}
+                                {server.commands.length > 3 && (
+                                  <span className="px-2 py-1 bg-gray-600 text-gray-400 text-xs rounded">
+                                    +{server.commands.length - 3} more
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-gray-400">Commands</span>
-                              <span className="text-white font-medium">{server.commands.length}</span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-gray-400">Tools</span>
-                              <span className="text-white font-medium">{server.tools.length}</span>
-                            </div>
-                          </div>
 
-                          {/* Commands Section */}
-                          <div>
-                            <h5 className="text-sm font-semibold text-gray-300 mb-2">Available Commands</h5>
-                            <div className="flex flex-wrap gap-2">
-                              {server.commands.map((command, index) => (
-                                <span key={index} className="px-2 py-1 bg-gray-600 text-gray-200 text-xs rounded font-mono">
-                                  {command}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Tools Section */}
-                          <div>
-                            <h5 className="text-sm font-semibold text-gray-300 mb-2">Integrated Tools</h5>
-                            <div className="grid grid-cols-2 gap-2">
-                              {server.tools.map((tool, index) => (
-                                <div key={index} className="flex items-center gap-2 p-2 bg-gray-600 rounded text-sm">
-                                  <Wrench className="w-3 h-3 text-blue-400" />
-                                  <span className="text-gray-200">{tool}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Features Section */}
-                          <div>
-                            <h5 className="text-sm font-semibold text-gray-300 mb-2">Features</h5>
-                            <div className="space-y-2">
-                              {server.features.map((feature) => (
-                                <div key={feature.id} className="p-3 bg-gray-600 rounded">
-                                  <div className="font-medium text-white text-sm">{feature.name}</div>
-                                  <div className="text-gray-300 text-xs mt-1">{feature.description}</div>
-                                </div>
-                              ))}
+                            {/* Tools Section */}
+                            <div>
+                              <h5 className="text-sm font-semibold text-gray-300 mb-2">Tools ({server.tools.length})</h5>
+                              <div className="space-y-1">
+                                {server.tools.slice(0, 2).map((tool, index) => (
+                                  <div key={index} className="flex items-center gap-2 text-sm">
+                                    <Wrench className="w-3 h-3 text-blue-400" />
+                                    <span className="text-gray-200">{tool}</span>
+                                  </div>
+                                ))}
+                                {server.tools.length > 2 && (
+                                  <div className="text-gray-400 text-xs">
+                                    +{server.tools.length - 2} more tools
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
