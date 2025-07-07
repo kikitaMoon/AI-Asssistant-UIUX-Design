@@ -582,7 +582,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
             <div className="w-full max-w-4xl">
               {/* Welcome Message */}
               <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 via-purple-500 to-purple-600 bg-clip-text text-transparent mb-2">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-purple-600 bg-clip-text text-transparent mb-2">
                   Hello, Sharon
                 </h1>
                 <p className="text-gray-400 text-lg">

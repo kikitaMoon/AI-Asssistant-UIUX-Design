@@ -70,7 +70,7 @@ const AddServer = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-white">
               Add New MCP Server
             </h1>
             <p className="text-gray-400 mt-1">Configure a new Model Context Protocol server</p>
