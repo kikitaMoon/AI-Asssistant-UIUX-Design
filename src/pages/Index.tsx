@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Upload, Camera, Check, ChevronDown, ChevronRight, Code, Database, Shield, Lightbulb, Server, Bot, Zap, Brain, Cpu, Wrench, Plus, Earth, Map, RefreshCw, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -85,6 +86,7 @@ const mcpServers = [
 ];
 
 const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) => {
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [canvasContent, setCanvasContent] = useState('');
   const [selectedModel, setSelectedModel] = useState('gpt-4');
@@ -260,7 +262,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   };
 
   const handleAddNewServer = () => {
-    console.log('Add new MCP server');
+    navigate('/add-server');
   };
 
   const handleModelSelection = (modelId: string) => {
