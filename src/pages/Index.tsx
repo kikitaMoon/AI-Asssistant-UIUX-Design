@@ -396,7 +396,6 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
 
   return (
     <div className="min-h-screen bg-black flex flex-col p-4 transition-colors duration-300 overflow-hidden">
-      <LoadingRibbon isVisible={isLoading} message={loadingMessage} />
       {/* Top bar with sidebar trigger and new chat button */}
       <div className="mb-4 flex justify-between items-center">
         <SidebarTrigger />
@@ -425,7 +424,8 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
 
       {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-7xl w-[90vw] h-[85vh] max-h-[85vh] p-0">
+        <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-7xl w-[90vw] h-[85vh] max-h-[85vh] p-0 relative">
+          <LoadingRibbon isVisible={isLoading} message={loadingMessage} />
           <DialogHeader className="px-6 pt-4 pb-2">
             <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-green-400 via-purple-500 to-purple-600 bg-clip-text text-transparent">
               Settings

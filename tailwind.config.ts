@@ -93,6 +93,10 @@ export default {
 					'0%': { transform: 'translateX(-100%)' },
 					'100%': { transform: 'translateX(100%)' }
 				},
+				'loading-scroll': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(300%)' }
+				},
 				'bounce-in': {
 					'0%': { transform: 'scale(0.8)', opacity: '0' },
 					'50%': { transform: 'scale(1.05)', opacity: '0.8' },
@@ -108,6 +112,7 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'slide-in-down': 'slide-in-down 0.3s ease-out',
 				'loading-shimmer': 'loading-shimmer 2s infinite',
+				'loading-scroll': 'loading-scroll 1.5s ease-in-out infinite',
 				'bounce-in': 'bounce-in 0.6s ease-out',
 				'pulse-glow': 'pulse-glow 2s infinite'
 			}
