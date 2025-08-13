@@ -16,6 +16,7 @@ import { TextCanvas } from '../components/TextCanvas';
 import { ProcessedTextResult } from '../components/ProcessedTextResult';
 import { MapPanel } from '../components/MapPanel';
 import { InfoCard } from '../components/InfoCard';
+import { LoadingRibbon } from '@/components/ui/loading-ribbon';
 
 interface ChatMessage {
   id: string;
@@ -96,6 +97,8 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isTextCanvasOpen, setIsTextCanvasOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -287,14 +290,28 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     setIsMapOpen(!isMapOpen);
   };
 
-  const handleRefreshServers = () => {
+  const handleRefreshServers = async () => {
+    setIsLoading(true);
+    setLoadingMessage('Refreshing MCP servers...');
     console.log('Refreshing MCP servers');
-    // This would refresh the server list
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsLoading(false);
+    setLoadingMessage('');
   };
 
-  const handleConfigureServer = (serverId: string) => {
+  const handleConfigureServer = async (serverId: string) => {
+    setIsLoading(true);
+    setLoadingMessage('Configuring server...');
     console.log('Configuring server:', serverId);
-    // This would open server configuration
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsLoading(false);
+    setLoadingMessage('');
   };
 
   const renderChatMessage = (msg: ChatMessage) => {
@@ -379,6 +396,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
 
   return (
     <div className="min-h-screen bg-black flex flex-col p-4 transition-colors duration-300 overflow-hidden">
+      <LoadingRibbon isVisible={isLoading} message={loadingMessage} />
       {/* Top bar with sidebar trigger and new chat button */}
       <div className="mb-4 flex justify-between items-center">
         <SidebarTrigger />
@@ -482,8 +500,12 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                     </div>
                     
                     <div className="grid gap-6">
-                      {mcpServers.map((server) => (
-                        <div key={server.id} className="bg-gray-700 rounded-lg p-6 space-y-4">
+                      {mcpServers.map((server, index) => (
+                        <div 
+                          key={server.id} 
+                          className="bg-gray-700 rounded-lg p-6 space-y-4 animate-bounce-in hover:animate-pulse-glow transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                          style={{ animationDelay: `${index * 0.1}s` }}
+                        >
                           {/* Server Header */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -499,9 +521,10 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
                               onClick={() => handleConfigureServer(server.id)}
                               size="sm"
                               variant="ghost"
-                              className="text-gray-300 hover:text-white hover:bg-gray-600"
+                              className="text-gray-300 hover:text-white hover:bg-gray-600 transition-all duration-200 hover:scale-105"
+                              disabled={isLoading}
                             >
-                              <Settings className="w-4 h-4 mr-2" />
+                              <Settings className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                               Config
                             </Button>
                           </div>
