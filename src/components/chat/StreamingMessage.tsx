@@ -113,67 +113,100 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
           </span>
         </div>
 
-        {/* Progress indicator for multi-step tasks */}
-        {progress !== undefined && role === 'assistant' && (
-          <div className="mb-3 bg-gray-800/50 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">Progress</span>
-              <span className="text-sm text-gray-400">{Math.round(progress)}%</span>
-            </div>
-            <Progress value={progress} className="h-2" />
-            
-            {/* Step indicators */}
-            {steps && (
-              <div className="mt-3 space-y-1">
-                {steps.map((step, index) => (
-                  <div key={index} className="flex items-center gap-2 text-sm">
-                    {step.completed ? (
-                      <CheckCircle className="w-3 h-3 text-green-400" />
-                    ) : step.current ? (
-                      <Loader2 className="w-3 h-3 text-blue-400 animate-spin" />
-                    ) : (
-                      <Clock className="w-3 h-3 text-gray-500" />
-                    )}
-                    <span className={step.completed ? 'text-green-400' : step.current ? 'text-blue-400' : 'text-gray-500'}>
-                      {step.step}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Thinking section (collapsible) */}
-        {thinking && role === 'assistant' && (
+        {/* Integrated Progress & Thinking Process */}
+        {((progress !== undefined && steps) || thinking) && role === 'assistant' && (
           <div className="mb-3">
             <Collapsible open={showThinking} onOpenChange={setShowThinking}>
               <CollapsibleTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 p-2 h-auto"
+                  className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 p-2 h-auto w-full justify-start"
                 >
                   <Brain className="w-3 h-3 mr-1" />
-                  <span className="text-xs">
-                    {showThinking ? 'Hide thinking' : 'Show thinking'}
+                  <span className="text-xs mr-2">
+                    {showThinking ? 'Hide reasoning process' : 'Show reasoning process'}
                   </span>
+                  {progress !== undefined && (
+                    <span className="text-xs text-gray-400 ml-auto mr-2">
+                      {Math.round(progress)}%
+                    </span>
+                  )}
                   {showThinking ? (
-                    <EyeOff className="w-3 h-3 ml-1" />
+                    <EyeOff className="w-3 h-3" />
                   ) : (
-                    <Eye className="w-3 h-3 ml-1" />
+                    <Eye className="w-3 h-3" />
                   )}
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-                  <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
-                    <Brain className="w-3 h-3" />
-                    AI Reasoning Process
+                <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4 space-y-4">
+                  {/* Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-purple-300 flex items-center gap-1">
+                      <Brain className="w-3 h-3" />
+                      AI Reasoning Process
+                    </div>
+                    {progress !== undefined && (
+                      <div className="text-xs text-purple-400">
+                        {Math.round(progress)}% Complete
+                      </div>
+                    )}
                   </div>
-                  <div className="text-sm text-gray-300 whitespace-pre-wrap font-mono">
-                    {thinking}
-                  </div>
+
+                  {/* Progress bar */}
+                  {progress !== undefined && (
+                    <div className="space-y-2">
+                      <Progress value={progress} className="h-1.5" />
+                    </div>
+                  )}
+
+                  {/* Step-by-step thinking process */}
+                  {steps && (
+                    <div className="space-y-3">
+                      {steps.map((step, index) => (
+                        <div key={index} className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            {step.completed ? (
+                              <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                            ) : step.current ? (
+                              <Loader2 className="w-4 h-4 text-blue-400 animate-spin flex-shrink-0" />
+                            ) : (
+                              <Clock className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                            )}
+                            <span className={`text-sm font-medium ${
+                              step.completed ? 'text-green-400' : 
+                              step.current ? 'text-blue-400' : 
+                              'text-gray-500'
+                            }`}>
+                              Step {index + 1}: {step.step}
+                            </span>
+                          </div>
+                          
+                          {/* Show thinking for current or completed steps */}
+                          {(step.current || step.completed) && thinking && (
+                            <div className="ml-6 pl-4 border-l-2 border-purple-500/30">
+                              <div className="text-xs text-gray-400 mb-1">Reasoning:</div>
+                              <div className="text-sm text-gray-300 bg-gray-800/50 rounded p-2 font-mono text-xs leading-relaxed">
+                                {thinking.split('\n').slice(index * 2, (index + 1) * 2).join('\n') || 
+                                 `Analyzing ${step.step.toLowerCase()}...`}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Full thinking process if no steps */}
+                  {thinking && !steps && (
+                    <div className="space-y-2">
+                      <div className="text-xs text-gray-400">Complete reasoning process:</div>
+                      <div className="text-sm text-gray-300 bg-gray-800/50 rounded p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap">
+                        {thinking}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CollapsibleContent>
             </Collapsible>
