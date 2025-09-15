@@ -3,7 +3,6 @@ import { Bot, User, Eye, EyeOff, Brain, Clock, CheckCircle, AlertCircle, Loader2
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Progress } from '@/components/ui/progress';
 
 interface StreamingMessageProps {
   id: string;
@@ -154,12 +153,6 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
                     )}
                   </div>
 
-                  {/* Progress bar */}
-                  {progress !== undefined && (
-                    <div className="space-y-2">
-                      <Progress value={progress} className="h-1.5" />
-                    </div>
-                  )}
 
                   {/* Step-by-step thinking process */}
                   {steps && (
