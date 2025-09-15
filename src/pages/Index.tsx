@@ -17,6 +17,8 @@ import { ProcessedTextResult } from '../components/ProcessedTextResult';
 import { MapPanel } from '../components/MapPanel';
 import { InfoCard } from '../components/InfoCard';
 import { LoadingRibbon } from '@/components/ui/loading-ribbon';
+import { ChatContainer } from '../components/chat/ChatContainer';
+import { ChatStatusBar } from '../components/chat/ChatStatusBar';
 
 interface ChatMessage {
   id: string;
@@ -24,6 +26,11 @@ interface ChatMessage {
   content: string;
   timestamp: Date;
   type?: 'text' | 'processed-result' | 'info-card';
+  isStreaming?: boolean;
+  thinking?: string;
+  status?: 'processing' | 'thinking' | 'completed' | 'error';
+  progress?: number;
+  steps?: { step: string; completed: boolean; current: boolean }[];
   cardData?: {
     title: string;
     imageUrl: string;
@@ -99,6 +106,10 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [chatStatus, setChatStatus] = useState<'idle' | 'thinking' | 'responding' | 'processing'>('idle');
+  const [isConnected, setIsConnected] = useState(true);
+  const [responseTime, setResponseTime] = useState<number>();
+  const [tokensUsed, setTokensUsed] = useState<number>();
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -167,32 +178,130 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
     }
   ];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const contentToSend = isTextCanvasOpen ? canvasContent : message;
     
     if (contentToSend.trim()) {
+      const startTime = Date.now();
+      setChatStatus('thinking');
+      
       const newMessage: ChatMessage = {
         id: Date.now().toString(),
         role: 'user',
         content: contentToSend,
         timestamp: new Date(),
-        type: 'text'
+        type: 'text',
+        status: 'completed'
       };
       setChatMessages(prev => [...prev, newMessage]);
       
-      // If canvas is open, process the text and add result to conversation
-      if (isTextCanvasOpen && canvasContent.trim()) {
-        const processedResult = `Processed text (${canvasContent.length} characters):\n\n${canvasContent}\n\n--- Analysis ---\nWord count: ${canvasContent.split(/\s+/).length}\nCharacter count: ${canvasContent.length}\nLines: ${canvasContent.split('\n').length}`;
+      // Simulate AI response with streaming and thinking
+      setTimeout(async () => {
+        setChatStatus('responding');
         
-        const resultMessage: ChatMessage = {
+        const assistantMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: processedResult,
+          content: '',
           timestamp: new Date(),
-          type: 'processed-result'
+          isStreaming: true,
+          status: 'thinking',
+          thinking: `Let me analyze this request: "${contentToSend}"
+
+First, I'll break down what the user is asking:
+1. Understanding the context and intent
+2. Identifying key information needed
+3. Structuring a helpful response
+
+The user seems to be asking about: ${contentToSend.substring(0, 50)}...
+
+I should provide a comprehensive answer that addresses their specific needs while being clear and actionable.`,
+          progress: 0,
+          steps: [
+            { step: 'Analyzing request', completed: false, current: true },
+            { step: 'Gathering information', completed: false, current: false },
+            { step: 'Generating response', completed: false, current: false },
+            { step: 'Finalizing answer', completed: false, current: false }
+          ]
         };
         
-        setChatMessages(prev => [...prev, resultMessage]);
+        setChatMessages(prev => [...prev, assistantMessage]);
+        
+        // Simulate thinking phase
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Update status to processing with steps
+        setChatMessages(prev => prev.map(msg => 
+          msg.id === assistantMessage.id 
+            ? { 
+                ...msg, 
+                status: 'processing',
+                progress: 25,
+                steps: msg.steps?.map((step, idx) => ({
+                  ...step,
+                  completed: idx === 0,
+                  current: idx === 1
+                }))
+              }
+            : msg
+        ));
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Continue with more steps
+        setChatMessages(prev => prev.map(msg => 
+          msg.id === assistantMessage.id 
+            ? { 
+                ...msg, 
+                progress: 60,
+                steps: msg.steps?.map((step, idx) => ({
+                  ...step,
+                  completed: idx <= 1,
+                  current: idx === 2
+                }))
+              }
+            : msg
+        ));
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Start streaming response
+        const fullResponse = `Thank you for your question about "${contentToSend}". I've analyzed your request and here's a comprehensive response:
+
+Based on your inquiry, I can provide several key insights and recommendations. This is a detailed explanation that demonstrates the streaming response feature.
+
+Let me break this down into actionable points:
+1. Understanding your specific context
+2. Providing relevant information
+3. Offering practical next steps
+
+I hope this response addresses your question effectively. Is there anything specific you'd like me to elaborate on?`;
+        
+        setChatMessages(prev => prev.map(msg => 
+          msg.id === assistantMessage.id 
+            ? { 
+                ...msg, 
+                content: fullResponse,
+                status: 'completed',
+                isStreaming: false,
+                progress: 100,
+                steps: msg.steps?.map(step => ({
+                  ...step,
+                  completed: true,
+                  current: false
+                }))
+              }
+            : msg
+        ));
+        
+        const endTime = Date.now();
+        setResponseTime(endTime - startTime);
+        setTokensUsed(Math.floor(Math.random() * 500) + 100);
+        setChatStatus('idle');
+      }, 500);
+      
+      // If canvas is open, process the text
+      if (isTextCanvasOpen && canvasContent.trim()) {
         setCanvasContent('');
         setIsTextCanvasOpen(false);
       }
@@ -217,7 +326,8 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       role: 'user',
       content: question.text,
       timestamp: new Date(),
-      type: 'text'
+      type: 'text',
+      status: 'completed'
     };
     
     const assistantMessage: ChatMessage = {
@@ -226,7 +336,11 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       content: question.sampleResponse,
       timestamp: new Date(),
       type: question.showCard ? 'info-card' : 'text',
-      cardData: question.cardData
+      cardData: question.cardData,
+      status: 'completed',
+      thinking: `The user selected a sample question: "${question.text}"
+
+This is a pre-defined response that demonstrates our capabilities. I should provide the prepared answer while maintaining context for follow-up questions.`
     };
 
     setChatMessages([userMessage, assistantMessage]);
@@ -634,10 +748,19 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
             </div>
           </div>
         ) : (
-          <div className="flex-1 mb-4 overflow-y-auto scrollbar-hide">
-            <div className="max-w-4xl mx-auto p-4">
-              {chatMessages.map(renderChatMessage)}
-            </div>
+          <div className="flex-1 flex flex-col">
+            <ChatContainer
+              messages={chatMessages}
+              isLoading={chatStatus !== 'idle'}
+              onRetryMessage={(messageId) => console.log('Retry message:', messageId)}
+            />
+            <ChatStatusBar
+              isConnected={isConnected}
+              currentModel={selectedModel}
+              responseTime={responseTime}
+              tokensUsed={tokensUsed}
+              status={chatStatus}
+            />
           </div>
         )}
 

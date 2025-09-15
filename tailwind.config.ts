@@ -105,6 +105,10 @@ export default {
 				'pulse-glow': {
 					'0%, 100%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.3)' },
 					'50%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.6)' }
+				},
+				'type-cursor': {
+					'0%, 50%': { opacity: '1' },
+					'51%, 100%': { opacity: '0' }
 				}
 			},
 			animation: {
@@ -114,7 +118,8 @@ export default {
 				'loading-shimmer': 'loading-shimmer 2s infinite',
 				'loading-scroll': 'loading-scroll 1.5s ease-in-out infinite',
 				'bounce-in': 'bounce-in 0.6s ease-out',
-				'pulse-glow': 'pulse-glow 2s infinite'
+				'pulse-glow': 'pulse-glow 2s infinite',
+				'type-cursor': 'type-cursor 1s infinite'
 			}
 		}
 	},
