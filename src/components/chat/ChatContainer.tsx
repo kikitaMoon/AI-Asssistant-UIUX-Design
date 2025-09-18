@@ -1,5 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StreamingMessage } from './StreamingMessage';
+import { MCPToolConfirmation } from './MCPToolConfirmation';
+
+interface MCPToolRequest {
+  toolName: string;
+  description: string;
+  parameters?: Record<string, any>;
+  riskLevel?: 'low' | 'medium' | 'high';
+}
 
 interface ChatMessage {
   id: string;
@@ -8,28 +16,47 @@ interface ChatMessage {
   timestamp: Date;
   isStreaming?: boolean;
   thinking?: string;
-  status?: 'processing' | 'thinking' | 'completed' | 'error';
+  status?: 'processing' | 'thinking' | 'completed' | 'error' | 'tool-confirmation';
   progress?: number;
   steps?: { step: string; completed: boolean; current: boolean }[];
+  mcpToolRequest?: MCPToolRequest;
 }
 
 interface ChatContainerProps {
   messages: ChatMessage[];
   isLoading?: boolean;
   onRetryMessage?: (messageId: string) => void;
+  onMCPToolConfirm?: (messageId: string, approved: boolean) => void;
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({
   messages,
   isLoading,
-  onRetryMessage
+  onRetryMessage,
+  onMCPToolConfirm
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [pendingToolMessage, setPendingToolMessage] = useState<ChatMessage | null>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Check for MCP tool confirmation requests
+  useEffect(() => {
+    const toolMessage = messages.find(msg => msg.status === 'tool-confirmation' && msg.mcpToolRequest);
+    if (toolMessage && !pendingToolMessage) {
+      setPendingToolMessage(toolMessage);
+    }
+  }, [messages, pendingToolMessage]);
+
+  const handleMCPToolConfirm = (approved: boolean) => {
+    if (pendingToolMessage && onMCPToolConfirm) {
+      onMCPToolConfirm(pendingToolMessage.id, approved);
+      setPendingToolMessage(null);
+    }
+  };
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
@@ -78,6 +105,13 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         </div>
       )}
       <div ref={messagesEndRef} />
+      
+      <MCPToolConfirmation
+        isOpen={!!pendingToolMessage}
+        toolRequest={pendingToolMessage?.mcpToolRequest}
+        onConfirm={() => handleMCPToolConfirm(true)}
+        onCancel={() => handleMCPToolConfirm(false)}
+      />
     </div>
   );
 };

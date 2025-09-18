@@ -11,7 +11,7 @@ interface StreamingMessageProps {
   timestamp: Date;
   isStreaming?: boolean;
   thinking?: string;
-  status?: 'processing' | 'thinking' | 'completed' | 'error';
+  status?: 'processing' | 'thinking' | 'completed' | 'error' | 'tool-confirmation';
   progress?: number;
   steps?: { step: string; completed: boolean; current: boolean }[];
   onRetry?: () => void;
