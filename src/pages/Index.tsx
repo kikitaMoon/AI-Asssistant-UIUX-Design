@@ -19,6 +19,7 @@ import { InfoCard } from '../components/InfoCard';
 import { LoadingRibbon } from '@/components/ui/loading-ribbon';
 import { ChatContainer } from '../components/chat/ChatContainer';
 import { ChatStatusBar } from '../components/chat/ChatStatusBar';
+import { ReasoningShowcase } from '../components/chat/ReasoningShowcase';
 
 interface ChatMessage {
   id: string;
@@ -110,6 +111,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const [isConnected, setIsConnected] = useState(true);
   const [responseTime, setResponseTime] = useState<number>();
   const [tokensUsed, setTokensUsed] = useState<number>();
+  const [isReasoningActive, setIsReasoningActive] = useState(false);
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -749,11 +751,23 @@ This is a pre-defined response that demonstrates our capabilities. I should prov
           </div>
         ) : (
           <div className="flex-1 flex flex-col">
-            <ChatContainer
-              messages={chatMessages}
-              isLoading={chatStatus !== 'idle'}
-              onRetryMessage={(messageId) => console.log('Retry message:', messageId)}
-            />
+            <div className="flex-1 flex">
+              <div className="flex-1">
+                <ChatContainer
+                  messages={chatMessages}
+                  isLoading={chatStatus !== 'idle'}
+                  onRetryMessage={(messageId) => console.log('Retry message:', messageId)}
+                />
+              </div>
+              {isReasoningActive && (
+                <div className="w-80 border-l bg-muted/20 p-4">
+                  <ReasoningShowcase 
+                    isActive={isReasoningActive}
+                    onComplete={() => setIsReasoningActive(false)}
+                  />
+                </div>
+              )}
+            </div>
             <ChatStatusBar
               isConnected={isConnected}
               currentModel={selectedModel}
@@ -942,6 +956,14 @@ This is a pre-defined response that demonstrates our capabilities. I should prov
                   <div className="flex items-center justify-between">
                     {/* Left aligned buttons */}
                     <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setIsReasoningActive(!isReasoningActive)}
+                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
+                        title="Step-by-step reasoning showcase"
+                      >
+                        <Brain className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
+                      </button>
+                      
                       <button
                         onClick={handleTextToEarth}
                         className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
