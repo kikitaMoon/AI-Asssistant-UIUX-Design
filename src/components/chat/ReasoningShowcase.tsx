@@ -44,6 +44,7 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
   const [isStreamingDescription, setIsStreamingDescription] = useState(false);
 
   useEffect(() => {
+    console.log('ReasoningShowcase useEffect triggered, isActive:', isActive);
     if (!isActive) {
       setCurrentStep(-1);
       setStreamingText('');
@@ -52,6 +53,7 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
       return;
     }
 
+    console.log('Starting reasoning showcase...');
     const runShowcase = async () => {
       for (let i = 0; i < DEMO_STEPS.length; i++) {
         setCurrentStep(i);

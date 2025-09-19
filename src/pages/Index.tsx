@@ -761,9 +761,15 @@ This is a pre-defined response that demonstrates our capabilities. I should prov
               </div>
               {isReasoningActive && (
                 <div className="w-80 border-l bg-muted/20 p-4">
+                  <div className="text-xs text-muted-foreground mb-2">
+                    Debug: Reasoning Active = {isReasoningActive.toString()}
+                  </div>
                   <ReasoningShowcase 
                     isActive={isReasoningActive}
-                    onComplete={() => setIsReasoningActive(false)}
+                    onComplete={() => {
+                      console.log('Reasoning showcase completed');
+                      setIsReasoningActive(false);
+                    }}
                   />
                 </div>
               )}
@@ -957,7 +963,10 @@ This is a pre-defined response that demonstrates our capabilities. I should prov
                     {/* Left aligned buttons */}
                     <div className="flex items-center space-x-3">
                       <button
-                        onClick={() => setIsReasoningActive(!isReasoningActive)}
+                        onClick={() => {
+                          console.log('Brain button clicked, current state:', isReasoningActive);
+                          setIsReasoningActive(!isReasoningActive);
+                        }}
                         className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
                         title="Step-by-step reasoning showcase"
                       >
