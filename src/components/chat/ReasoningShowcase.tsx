@@ -42,26 +42,28 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
   const [streamingText, setStreamingText] = useState('');
   const [isStreamingTitle, setIsStreamingTitle] = useState(false);
   const [isStreamingDescription, setIsStreamingDescription] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<ReasoningStep[]>([]);
 
   useEffect(() => {
-    console.log('ReasoningShowcase useEffect triggered, isActive:', isActive);
     if (!isActive) {
       setCurrentStep(-1);
       setStreamingText('');
       setIsStreamingTitle(false);
       setIsStreamingDescription(false);
+      setCompletedSteps([]);
       return;
     }
 
-    console.log('Starting reasoning showcase...');
     const runShowcase = async () => {
+      setCompletedSteps([]);
+      
       for (let i = 0; i < DEMO_STEPS.length; i++) {
         setCurrentStep(i);
+        const step = DEMO_STEPS[i];
         
         // Stream title
         setIsStreamingTitle(true);
         setStreamingText('');
-        const step = DEMO_STEPS[i];
         
         for (let j = 0; j <= step.title.length; j++) {
           setStreamingText(step.title.substring(0, j));
@@ -81,9 +83,13 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
         }
         setIsStreamingDescription(false);
         
+        // Add completed step to the list
+        setCompletedSteps(prev => [...prev, step]);
+        
         await new Promise(resolve => setTimeout(resolve, 800));
       }
       
+      setCurrentStep(-1);
       onComplete?.();
     };
 
@@ -93,56 +99,64 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
   if (!isActive) return null;
 
   return (
-    <div className="border-l-2 border-primary/30 pl-4 space-y-3">
+    <div className="border-l-2 border-primary/30 pl-4 space-y-3 bg-muted/10 rounded-lg p-4 mb-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
         <Brain className="w-4 h-4" />
         <span>Step-by-step reasoning</span>
       </div>
       
-      {DEMO_STEPS.map((step, index) => (
-        <div 
-          key={index} 
-          className={`transition-all duration-500 ${
-            index <= currentStep ? 'opacity-100' : 'opacity-30'
-          }`}
-        >
+      {/* Render completed steps */}
+      {completedSteps.map((step, index) => (
+        <div key={`completed-${index}`} className="animate-fade-in">
           <div className="flex items-start gap-3">
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all duration-300 ${
-              index < currentStep ? 'bg-primary text-primary-foreground' : 
-              index === currentStep ? 'bg-secondary text-secondary-foreground animate-pulse' : 
-              'bg-muted text-muted-foreground'
-            }`}>
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs bg-primary text-primary-foreground">
               {index + 1}
             </div>
             
             <div className="flex-1 space-y-1">
-              <div className="font-medium">
-                {index === currentStep && isStreamingTitle ? (
-                  <>
-                    {streamingText}
-                    <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-1" />
-                  </>
-                ) : (
-                  index <= currentStep ? step.title : step.title
-                )}
-              </div>
+              <div className="font-medium">{step.title}</div>
+              <div className="text-sm text-muted-foreground">{step.description}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+      
+      {/* Render current streaming step */}
+      {currentStep >= 0 && (
+        <div className="animate-fade-in">
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs bg-secondary text-secondary-foreground">
+              {completedSteps.length + 1}
+            </div>
+            
+            <div className="flex-1 space-y-1">
+              {isStreamingTitle && (
+                <div className="font-medium">
+                  {streamingText}
+                  <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-1" />
+                </div>
+              )}
               
-              {index <= currentStep && !isStreamingTitle && (
+              {!isStreamingTitle && (
+                <div className="font-medium">{DEMO_STEPS[currentStep].title}</div>
+              )}
+              
+              {!isStreamingTitle && isStreamingDescription && (
                 <div className="text-sm text-muted-foreground">
-                  {index === currentStep && isStreamingDescription ? (
-                    <>
-                      {streamingText}
-                      <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-1" />
-                    </>
-                  ) : (
-                    step.description
-                  )}
+                  {streamingText}
+                  <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-1" />
+                </div>
+              )}
+              
+              {!isStreamingTitle && !isStreamingDescription && currentStep >= 0 && (
+                <div className="text-sm text-muted-foreground">
+                  {DEMO_STEPS[currentStep].description}
                 </div>
               )}
             </div>
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 };

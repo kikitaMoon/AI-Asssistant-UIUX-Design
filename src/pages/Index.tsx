@@ -112,6 +112,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const [responseTime, setResponseTime] = useState<number>();
   const [tokensUsed, setTokensUsed] = useState<number>();
   const [isReasoningActive, setIsReasoningActive] = useState(false);
+  const [showReasoningInChat, setShowReasoningInChat] = useState(false);
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -757,22 +758,9 @@ This is a pre-defined response that demonstrates our capabilities. I should prov
                   messages={chatMessages}
                   isLoading={chatStatus !== 'idle'}
                   onRetryMessage={(messageId) => console.log('Retry message:', messageId)}
+                  showReasoning={showReasoningInChat}
                 />
               </div>
-              {isReasoningActive && (
-                <div className="w-80 border-l bg-muted/20 p-4">
-                  <div className="text-xs text-muted-foreground mb-2">
-                    Debug: Reasoning Active = {isReasoningActive.toString()}
-                  </div>
-                  <ReasoningShowcase 
-                    isActive={isReasoningActive}
-                    onComplete={() => {
-                      console.log('Reasoning showcase completed');
-                      setIsReasoningActive(false);
-                    }}
-                  />
-                </div>
-              )}
             </div>
             <ChatStatusBar
               isConnected={isConnected}
@@ -963,12 +951,11 @@ This is a pre-defined response that demonstrates our capabilities. I should prov
                     {/* Left aligned buttons */}
                     <div className="flex items-center space-x-3">
                       <button
-                        onClick={() => {
-                          console.log('Brain button clicked, current state:', isReasoningActive);
-                          setIsReasoningActive(!isReasoningActive);
-                        }}
-                        className="p-2 rounded-lg hover:bg-gray-600 transition-colors duration-200 group"
-                        title="Step-by-step reasoning showcase"
+                        onClick={() => setShowReasoningInChat(!showReasoningInChat)}
+                        className={`p-2 rounded-lg transition-colors duration-200 group ${
+                          showReasoningInChat ? 'bg-primary text-primary-foreground' : 'hover:bg-gray-600'
+                        }`}
+                        title="Toggle step-by-step reasoning in responses"
                       >
                         <Brain className="w-5 h-5 text-gray-300 group-hover:text-blue-400" />
                       </button>

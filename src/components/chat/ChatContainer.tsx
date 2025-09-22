@@ -27,13 +27,15 @@ interface ChatContainerProps {
   isLoading?: boolean;
   onRetryMessage?: (messageId: string) => void;
   onMCPToolConfirm?: (messageId: string, approved: boolean) => void;
+  showReasoning?: boolean;
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({
   messages,
   isLoading,
   onRetryMessage,
-  onMCPToolConfirm
+  onMCPToolConfirm,
+  showReasoning = false
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [pendingToolMessage, setPendingToolMessage] = useState<ChatMessage | null>(null);
@@ -86,6 +88,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
               progress={message.progress}
               steps={message.steps}
               onRetry={() => onRetryMessage?.(message.id)}
+              showReasoning={showReasoning}
             />
           ))}
           

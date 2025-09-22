@@ -3,6 +3,7 @@ import { Bot, User, Eye, EyeOff, Brain, Clock, CheckCircle, AlertCircle, Loader2
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ReasoningShowcase } from './ReasoningShowcase';
 
 interface StreamingMessageProps {
   id: string;
@@ -15,6 +16,7 @@ interface StreamingMessageProps {
   progress?: number;
   steps?: { step: string; completed: boolean; current: boolean }[];
   onRetry?: () => void;
+  showReasoning?: boolean;
 }
 
 export const StreamingMessage: React.FC<StreamingMessageProps> = ({
@@ -27,7 +29,8 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
   status = 'completed',
   progress,
   steps,
-  onRetry
+  onRetry,
+  showReasoning = false
 }) => {
   const [displayedContent, setDisplayedContent] = useState('');
   const [showThinking, setShowThinking] = useState(false);
@@ -93,6 +96,14 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
             {timestamp.toLocaleTimeString()}
           </span>
         </div>
+
+        {/* Show reasoning for assistant messages when enabled */}
+        {role === 'assistant' && showReasoning && (status === 'processing' || status === 'thinking' || isStreaming) && (
+          <ReasoningShowcase 
+            isActive={true}
+            onComplete={() => {}}
+          />
+        )}
 
         {/* Thinking Process */}
         {(thinking || steps) && role === 'assistant' && (
