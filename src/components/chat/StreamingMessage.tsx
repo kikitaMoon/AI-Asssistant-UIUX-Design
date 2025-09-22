@@ -98,7 +98,7 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
         </div>
 
         {/* Show reasoning for assistant messages when enabled */}
-        {role === 'assistant' && showReasoning && (status === 'processing' || status === 'thinking' || isStreaming) && (
+        {role === 'assistant' && showReasoning && (
           <ReasoningShowcase 
             isActive={true}
             onComplete={() => {}}

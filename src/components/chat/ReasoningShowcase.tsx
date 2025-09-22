@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Brain } from 'lucide-react';
 
 interface ReasoningStep {
@@ -43,6 +43,7 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
   const [isStreamingTitle, setIsStreamingTitle] = useState(false);
   const [isStreamingDescription, setIsStreamingDescription] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<ReasoningStep[]>([]);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isActive) {
@@ -54,46 +55,56 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
       return;
     }
 
+    let cancelled = false;
+    const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
     const runShowcase = async () => {
       setCompletedSteps([]);
-      
+
       for (let i = 0; i < DEMO_STEPS.length; i++) {
+        if (cancelled) break;
         setCurrentStep(i);
         const step = DEMO_STEPS[i];
-        
-        // Stream title
+
+        // Stream title (faster) and auto-scroll
         setIsStreamingTitle(true);
         setStreamingText('');
-        
         for (let j = 0; j <= step.title.length; j++) {
+          if (cancelled) break;
           setStreamingText(step.title.substring(0, j));
-          await new Promise(resolve => setTimeout(resolve, 50));
+          if (j % 3 === 0) bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          await sleep(15);
         }
         setIsStreamingTitle(false);
-        
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Stream description
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        await sleep(200);
+
+        // Stream description (faster) and auto-scroll
         setIsStreamingDescription(true);
         setStreamingText('');
-        
         for (let j = 0; j <= step.description.length; j++) {
+          if (cancelled) break;
           setStreamingText(step.description.substring(0, j));
-          await new Promise(resolve => setTimeout(resolve, 30));
+          if (j % 5 === 0) bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          await sleep(12);
         }
         setIsStreamingDescription(false);
-        
+
         // Add completed step to the list
-        setCompletedSteps(prev => [...prev, step]);
-        
-        await new Promise(resolve => setTimeout(resolve, 800));
+        setCompletedSteps((prev) => [...prev, step]);
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        await sleep(400);
       }
-      
+
       setCurrentStep(-1);
       onComplete?.();
     };
 
     runShowcase();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isActive, onComplete]);
 
   if (!isActive) return null;
@@ -123,7 +134,7 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
       
       {/* Render current streaming step */}
       {currentStep >= 0 && (
-        <div className="animate-fade-in">
+        <div className="">
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs bg-secondary text-secondary-foreground">
               {completedSteps.length + 1}
@@ -157,6 +168,7 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
           </div>
         </div>
       )}
+      <div ref={bottomRef} />
     </div>
   );
 };
