@@ -110,61 +110,92 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
   if (!isActive) return null;
 
   return (
-    <div className="border-l-2 border-primary/30 pl-4 space-y-3 bg-muted/10 rounded-lg p-4 mb-4">
+    <div className="bg-muted/10 rounded-lg p-4 mb-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
         <Brain className="w-4 h-4" />
         <span>Step-by-step reasoning</span>
       </div>
       
-      {/* Render completed steps */}
-      {completedSteps.map((step, index) => (
-        <div key={`completed-${index}`} className="animate-fade-in">
-          <div className="flex items-start gap-3">
-            <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 mt-1"></div>
-            
-            <div className="flex-1 space-y-1">
-              <div className="font-medium">{step.title}</div>
-              <div className="text-sm text-muted-foreground">{step.description}</div>
+      <div className="relative">
+        {/* Render completed steps */}
+        {completedSteps.map((step, index) => (
+          <div key={`completed-${index}`} className="animate-fade-in relative">
+            <div className="flex items-start gap-3">
+              <div className="relative">
+                <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 mt-1 relative z-10"></div>
+                {/* Connecting line to next step */}
+                {index < DEMO_STEPS.length - 1 && (
+                  <div className="absolute left-1.5 top-4 w-0.5 h-12 bg-emerald-300/50 transform -translate-x-0.5"></div>
+                )}
+              </div>
+              
+              <div className="flex-1 space-y-1 pb-8">
+                <div className="font-medium">{step.title}</div>
+                <div className="text-sm text-muted-foreground">{step.description}</div>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-      
-      {/* Render current streaming step */}
-      {currentStep >= 0 && (
-        <div className="">
-          <div className="flex items-start gap-3">
-            <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse shadow-sm shadow-blue-500/50 mt-1"></div>
-            
-            <div className="flex-1 space-y-1">
-              {isStreamingTitle && (
-                <div className="font-medium">
-                  {streamingText}
-                  <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-1" />
-                </div>
-              )}
+        ))}
+        
+        {/* Render current streaming step with growing line */}
+        {currentStep >= 0 && (
+          <div className="relative">
+            <div className="flex items-start gap-3">
+              <div className="relative">
+                {/* Growing line from previous step */}
+                {completedSteps.length > 0 && (
+                  <div className="absolute left-1.5 -top-8 w-0.5 bg-blue-400 transform -translate-x-0.5 animate-pulse"
+                       style={{ 
+                         height: '32px',
+                         background: 'linear-gradient(to bottom, rgb(96, 165, 250), rgba(96, 165, 250, 0.3))'
+                       }}>
+                  </div>
+                )}
+                
+                <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse shadow-sm shadow-blue-500/50 mt-1 relative z-10"></div>
+                
+                {/* Growing line to next step */}
+                {currentStep < DEMO_STEPS.length - 1 && (
+                  <div className="absolute left-1.5 top-4 w-0.5 bg-blue-400/30 transform -translate-x-0.5"
+                       style={{ 
+                         height: isStreamingDescription ? '48px' : '24px',
+                         transition: 'height 0.5s ease-out'
+                       }}>
+                  </div>
+                )}
+              </div>
               
-              {!isStreamingTitle && (
-                <div className="font-medium">{DEMO_STEPS[currentStep].title}</div>
-              )}
-              
-              {!isStreamingTitle && isStreamingDescription && (
-                <div className="text-sm text-muted-foreground">
-                  {streamingText}
-                  <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-1" />
-                </div>
-              )}
-              
-              {!isStreamingTitle && !isStreamingDescription && currentStep >= 0 && (
-                <div className="text-sm text-muted-foreground">
-                  {DEMO_STEPS[currentStep].description}
-                </div>
-              )}
+              <div className="flex-1 space-y-1 pb-8">
+                {isStreamingTitle && (
+                  <div className="font-medium">
+                    {streamingText}
+                    <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-1" />
+                  </div>
+                )}
+                
+                {!isStreamingTitle && (
+                  <div className="font-medium">{DEMO_STEPS[currentStep].title}</div>
+                )}
+                
+                {!isStreamingTitle && isStreamingDescription && (
+                  <div className="text-sm text-muted-foreground">
+                    {streamingText}
+                    <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-1" />
+                  </div>
+                )}
+                
+                {!isStreamingTitle && !isStreamingDescription && currentStep >= 0 && (
+                  <div className="text-sm text-muted-foreground">
+                    {DEMO_STEPS[currentStep].description}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      <div ref={bottomRef} />
+        )}
+        
+        <div ref={bottomRef} />
+      </div>
     </div>
   );
 };
