@@ -43,6 +43,8 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
   const [isStreamingTitle, setIsStreamingTitle] = useState(false);
   const [isStreamingDescription, setIsStreamingDescription] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<ReasoningStep[]>([]);
+  const [showCurrentDot, setShowCurrentDot] = useState(false);
+  const [lineHeight, setLineHeight] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,6 +54,8 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
       setIsStreamingTitle(false);
       setIsStreamingDescription(false);
       setCompletedSteps([]);
+      setShowCurrentDot(false);
+      setLineHeight(0);
       return;
     }
 
@@ -60,11 +64,32 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
 
     const runShowcase = async () => {
       setCompletedSteps([]);
+      setShowCurrentDot(false);
+      setLineHeight(0);
 
       for (let i = 0; i < DEMO_STEPS.length; i++) {
         if (cancelled) break;
         setCurrentStep(i);
         const step = DEMO_STEPS[i];
+
+        // First animate the line growing to this step (if not first step)
+        if (i > 0) {
+          setLineHeight(0);
+          // Animate line height from 0 to full height over 500ms
+          const lineGrowth = async () => {
+            for (let height = 0; height <= 48; height += 2) {
+              if (cancelled) break;
+              setLineHeight(height);
+              await sleep(10);
+            }
+          };
+          await lineGrowth();
+          await sleep(100);
+        }
+
+        // Then show the dot growing
+        setShowCurrentDot(true);
+        await sleep(200);
 
         // Stream title (faster) and auto-scroll
         setIsStreamingTitle(true);
@@ -90,8 +115,10 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
         }
         setIsStreamingDescription(false);
 
-        // Add completed step to the list
+        // Add completed step to the list and reset current step states
         setCompletedSteps((prev) => [...prev, step]);
+        setShowCurrentDot(false);
+        setLineHeight(0);
         bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
         await sleep(400);
       }
@@ -121,11 +148,18 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
         {completedSteps.map((step, index) => (
           <div key={`completed-${index}`} className="animate-fade-in relative">
             <div className="flex items-start gap-3">
-              <div className="relative">
-                <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 mt-1 relative z-10"></div>
+              <div className="relative flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 relative z-10"></div>
                 {/* Connecting line to next step */}
-                {index < DEMO_STEPS.length - 1 && (
-                  <div className="absolute left-1.5 top-4 w-0.5 h-12 bg-emerald-300/50 transform -translate-x-0.5"></div>
+                {index < completedSteps.length - 1 && (
+                  <div className="w-0.5 h-12 bg-emerald-300/50 mt-1"></div>
+                )}
+                {/* Line to current step if this is the last completed step */}
+                {index === completedSteps.length - 1 && currentStep >= 0 && (
+                  <div 
+                    className="w-0.5 bg-blue-400/60 mt-1 transition-all duration-300 ease-out"
+                    style={{ height: `${lineHeight}px` }}
+                  ></div>
                 )}
               </div>
               
@@ -137,32 +171,18 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
           </div>
         ))}
         
-        {/* Render current streaming step with growing line */}
+        {/* Render current streaming step */}
         {currentStep >= 0 && (
           <div className="relative">
             <div className="flex items-start gap-3">
-              <div className="relative">
-                {/* Growing line from previous step */}
-                {completedSteps.length > 0 && (
-                  <div className="absolute left-1.5 -top-8 w-0.5 bg-blue-400 transform -translate-x-0.5 animate-pulse"
-                       style={{ 
-                         height: '32px',
-                         background: 'linear-gradient(to bottom, rgb(96, 165, 250), rgba(96, 165, 250, 0.3))'
-                       }}>
-                  </div>
-                )}
-                
-                <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse shadow-sm shadow-blue-500/50 mt-1 relative z-10"></div>
-                
-                {/* Growing line to next step */}
-                {currentStep < DEMO_STEPS.length - 1 && (
-                  <div className="absolute left-1.5 top-4 w-0.5 bg-blue-400/30 transform -translate-x-0.5"
-                       style={{ 
-                         height: isStreamingDescription ? '48px' : '24px',
-                         transition: 'height 0.5s ease-out'
-                       }}>
-                  </div>
-                )}
+              <div className="relative flex flex-col items-center">
+                <div 
+                  className={`w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50 relative z-10 transition-all duration-300 ${
+                    showCurrentDot 
+                      ? 'scale-100 opacity-100' 
+                      : 'scale-0 opacity-0'
+                  }`}
+                ></div>
               </div>
               
               <div className="flex-1 space-y-1 pb-8">
