@@ -152,14 +152,16 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
                 <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 relative z-10"></div>
                 {/* Connecting line to next step */}
                 {index < completedSteps.length - 1 && (
-                  <div className="w-0.5 h-12 bg-emerald-300/50 mt-1"></div>
+                  <div className="w-0.5 h-12 bg-gradient-to-b from-emerald-400/80 to-emerald-300/40 absolute top-3 left-1/2 -translate-x-1/2"></div>
                 )}
                 {/* Line to current step if this is the last completed step */}
                 {index === completedSteps.length - 1 && currentStep >= 0 && (
                   <div 
-                    className="w-0.5 bg-blue-400/60 mt-1 transition-all duration-300 ease-out"
+                    className="w-0.5 bg-gradient-to-b from-emerald-400/80 via-emerald-300/60 to-blue-500/80 absolute top-3 left-1/2 -translate-x-1/2 transition-all duration-500 ease-out overflow-hidden"
                     style={{ height: `${lineHeight}px` }}
-                  ></div>
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-400/30 to-blue-500/50 animate-pulse"></div>
+                  </div>
                 )}
               </div>
               
