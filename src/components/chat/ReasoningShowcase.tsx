@@ -120,9 +120,7 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
       {completedSteps.map((step, index) => (
         <div key={`completed-${index}`} className="animate-fade-in">
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs bg-primary text-primary-foreground">
-              {index + 1}
-            </div>
+            <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 mt-1"></div>
             
             <div className="flex-1 space-y-1">
               <div className="font-medium">{step.title}</div>
@@ -136,9 +134,7 @@ export const ReasoningShowcase: React.FC<ReasoningShowcaseProps> = ({
       {currentStep >= 0 && (
         <div className="">
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs bg-secondary text-secondary-foreground">
-              {completedSteps.length + 1}
-            </div>
+            <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse shadow-sm shadow-blue-500/50 mt-1"></div>
             
             <div className="flex-1 space-y-1">
               {isStreamingTitle && (
