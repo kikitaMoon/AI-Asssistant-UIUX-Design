@@ -20,6 +20,7 @@ import { LoadingRibbon } from '@/components/ui/loading-ribbon';
 import { ChatContainer } from '../components/chat/ChatContainer';
 import { ChatStatusBar } from '../components/chat/ChatStatusBar';
 import { ReasoningShowcase } from '../components/chat/ReasoningShowcase';
+import { MCPDemo } from '../components/chat/MCPDemo';
 
 interface ChatMessage {
   id: string;
@@ -29,7 +30,7 @@ interface ChatMessage {
   type?: 'text' | 'processed-result' | 'info-card';
   isStreaming?: boolean;
   thinking?: string;
-  status?: 'processing' | 'thinking' | 'completed' | 'error';
+  status?: 'processing' | 'thinking' | 'completed' | 'error' | 'tool-confirmation';
   progress?: number;
   steps?: { step: string; completed: boolean; current: boolean }[];
   cardData?: {
@@ -41,6 +42,12 @@ interface ChatMessage {
     dataType?: string;
     author?: string;
     authorUrl?: string;
+  };
+  mcpToolRequest?: {
+    toolName: string;
+    description: string;
+    parameters?: Record<string, any>;
+    riskLevel?: 'low' | 'medium' | 'high';
   };
 }
 
@@ -113,6 +120,7 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
   const [tokensUsed, setTokensUsed] = useState<number>();
   const [isReasoningActive, setIsReasoningActive] = useState(false);
   const [showReasoningInChat, setShowReasoningInChat] = useState(false);
+  const [showMCPDemo, setShowMCPDemo] = useState(false);
   
   const { isDark, toggleTheme } = useTheme();
   const { open: sidebarOpen, isMobile } = useSidebar();
@@ -173,6 +181,22 @@ const IndexContent = ({ isSettingsOpen, setIsSettingsOpen }: IndexContentProps) 
       text: "How do I implement authentication in a web app?",
       icon: Shield,
       sampleResponse: "Authentication implementation steps:\n\n1. **Choose authentication method** (JWT, OAuth, etc.)\n2. **Set up secure password hashing** (bcrypt)\n3. **Implement login/logout endpoints**\n4. **Use HTTPS** for all auth requests\n5. **Store tokens securely** (httpOnly cookies)\n6. **Add route protection** middleware"
+    },
+    {
+      text: "🔧 Trigger MCP Tool: Search project files",
+      icon: Wrench,
+      sampleResponse: "I'll help you search through the project files. This requires using an external MCP tool.",
+      requiresMCPTool: true,
+      mcpToolRequest: {
+        toolName: 'file_search',
+        description: 'Search through project files to find specific patterns or content',
+        parameters: {
+          query: 'useState',
+          fileTypes: ['.tsx', '.ts'],
+          maxResults: 10
+        },
+        riskLevel: 'low' as const
+      }
     },
     {
       text: "What's the difference between REST and GraphQL APIs?",
@@ -323,7 +347,7 @@ I hope this response addresses your question effectively. Is there anything spec
     }
   };
 
-  const handleSampleQuestion = (question: { text: string; sampleResponse: string; showCard?: boolean; cardData?: any }) => {
+  const handleSampleQuestion = (question: { text: string; sampleResponse: string; showCard?: boolean; cardData?: any; requiresMCPTool?: boolean; mcpToolRequest?: any }) => {
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -333,21 +357,73 @@ I hope this response addresses your question effectively. Is there anything spec
       status: 'completed'
     };
     
-    const assistantMessage: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      role: 'assistant',
-      content: question.sampleResponse,
-      timestamp: new Date(),
-      type: question.showCard ? 'info-card' : 'text',
-      cardData: question.cardData,
-      status: 'completed',
-      thinking: `The user selected a sample question: "${question.text}"
+    
+    let assistantMessage: ChatMessage;
+    
+    if (question.requiresMCPTool && question.mcpToolRequest) {
+      // Create message with MCP tool confirmation request
+      assistantMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: question.sampleResponse,
+        timestamp: new Date(),
+        status: 'tool-confirmation',
+        mcpToolRequest: question.mcpToolRequest
+      };
+    } else {
+      assistantMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: question.sampleResponse,
+        timestamp: new Date(),
+        type: question.showCard ? 'info-card' : 'text',
+        cardData: question.cardData,
+        status: 'completed',
+        thinking: `The user selected a sample question: "${question.text}"
 
 This is a pre-defined response that demonstrates our capabilities. I should provide the prepared answer while maintaining context for follow-up questions.`
-    };
+      };
+    }
 
     setChatMessages([userMessage, assistantMessage]);
-    setMessage('');
+  };
+
+  // Handle MCP Tool confirmation
+  const handleMCPToolConfirm = (messageId: string, approved: boolean) => {
+    setChatMessages(prev => prev.map(msg => {
+      if (msg.id === messageId) {
+        if (approved) {
+          return {
+            ...msg,
+            status: 'processing' as const,
+            content: 'Tool approved! Executing file search...'
+          };
+        } else {
+          return {
+            ...msg,
+            status: 'completed' as const,
+            content: 'Tool execution denied by user.'
+          };
+        }
+      }
+      return msg;
+    }));
+
+    // Simulate tool execution if approved
+    if (approved) {
+      setTimeout(() => {
+        setChatMessages(prev => prev.map(msg => {
+          if (msg.id === messageId) {
+            return {
+              ...msg,
+              status: 'completed' as const,
+              content: '✅ File search completed!\n\nFound 8 occurrences of "useState" in your project:\n\n• src/pages/Index.tsx (5 matches)\n• src/components/Chat.tsx (2 matches)\n• src/hooks/useAuth.tsx (1 match)\n\nThe search tool successfully scanned 47 TypeScript files.'
+            };
+          }
+          return msg;
+        }));
+      }, 2000);
+    }
   };
 
   const handleNewChat = () => {
@@ -744,9 +820,26 @@ This is a pre-defined response that demonstrates our capabilities. I should prov
                         <IconComponent className="w-6 h-6 text-blue-400" />
                         <span className="text-sm leading-relaxed">{item.text}</span>
                       </button>
-                    );
-                  })}
+                  );
+                })}
+              </div>
+              
+              {/* MCP Demo Section */}
+              <div className="text-center mb-8">
+                <button
+                  onClick={() => setShowMCPDemo(!showMCPDemo)}
+                  className="px-6 py-3 bg-mcp-progress hover:bg-mcp-progress/90 text-white rounded-lg transition-colors duration-200 font-medium"
+                >
+                  {showMCPDemo ? 'Hide MCP Demo' : 'Show MCP Tool Demo'}
+                </button>
+              </div>
+              
+              {/* MCP Demo Component */}
+              {showMCPDemo && (
+                <div className="mb-8">
+                  <MCPDemo />
                 </div>
+              )}
               </div>
             </div>
           </div>
@@ -758,6 +851,7 @@ This is a pre-defined response that demonstrates our capabilities. I should prov
                   messages={chatMessages}
                   isLoading={chatStatus !== 'idle'}
                   onRetryMessage={(messageId) => console.log('Retry message:', messageId)}
+                  onMCPToolConfirm={handleMCPToolConfirm}
                   showReasoning={showReasoningInChat}
                 />
               </div>
