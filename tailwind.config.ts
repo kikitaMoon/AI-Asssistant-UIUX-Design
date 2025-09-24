@@ -61,6 +61,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				mcp: {
+					request: 'hsl(var(--mcp-request))',
+					'request-foreground': 'hsl(var(--mcp-request-foreground))',
+					progress: 'hsl(var(--mcp-progress))',
+					success: 'hsl(var(--mcp-success))',
+					error: 'hsl(var(--mcp-error))',
+					warning: 'hsl(var(--mcp-warning))'
+				},
+				glass: {
+					bg: 'hsl(var(--glass-bg))',
+					border: 'hsl(var(--glass-border))',
+					shadow: 'hsl(var(--glass-shadow))'
 				}
 			},
 			borderRadius: {
@@ -109,6 +122,14 @@ export default {
 				'type-cursor': {
 					'0%, 50%': { opacity: '1' },
 					'51%, 100%': { opacity: '0' }
+				},
+				'mcp-pulse': {
+					'0%, 100%': { transform: 'scale(1)', opacity: '1' },
+					'50%': { transform: 'scale(1.05)', opacity: '0.8' }
+				},
+				'glass-shimmer': {
+					'0%': { transform: 'translateX(-100%) rotate(45deg)' },
+					'100%': { transform: 'translateX(300%) rotate(45deg)' }
 				}
 			},
 			animation: {
@@ -119,7 +140,9 @@ export default {
 				'loading-scroll': 'loading-scroll 1.5s ease-in-out infinite',
 				'bounce-in': 'bounce-in 0.6s ease-out',
 				'pulse-glow': 'pulse-glow 2s infinite',
-				'type-cursor': 'type-cursor 1s infinite'
+				'type-cursor': 'type-cursor 1s infinite',
+				'mcp-pulse': 'mcp-pulse 2s infinite',
+				'glass-shimmer': 'glass-shimmer 1.5s infinite'
 			}
 		}
 	},

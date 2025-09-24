@@ -3,6 +3,7 @@ import { StreamingMessage } from './StreamingMessage';
 import { MCPToolConfirmation } from './MCPToolConfirmation';
 
 interface MCPToolRequest {
+  id?: string;
   toolName: string;
   description: string;
   parameters?: Record<string, any>;
